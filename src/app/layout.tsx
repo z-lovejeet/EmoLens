@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import { Outfit, Inter } from 'next/font/google';
+import { Navigation } from '@/components/layout/Navigation';
+import { Toast } from '@/components/ui/Toast';
 import './globals.css';
 
 const outfit = Outfit({
@@ -72,7 +74,9 @@ export default function RootLayout({
         />
       </head>
       <body>
+        <Navigation />
         {children}
+        <Toast />
       </body>
     </html>
   );
