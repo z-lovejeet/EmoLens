@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 
+export type Gender = 'male' | 'female';
+
 export type ZoneId =
   | 'head' | 'throat' | 'chest' | 'stomach' | 'back'
   | 'shoulder_l' | 'shoulder_r'
@@ -17,6 +19,10 @@ export interface ZoneData {
 }
 
 interface CheckinState {
+  // Gender selection
+  gender: Gender | null;
+  setGender: (g: Gender) => void;
+
   activeZone: ZoneId | null;
   hoveredZone: ZoneId | null;
   isZoomed: boolean;
@@ -52,6 +58,9 @@ const createEmptyZoneData = (): Record<ZoneId, ZoneData> => {
 };
 
 export const useCheckinStore = create<CheckinState>((set, get) => ({
+  gender: null,
+  setGender: (g) => set({ gender: g }),
+
   activeZone: null,
   hoveredZone: null,
   isZoomed: false,
@@ -105,6 +114,7 @@ export const useCheckinStore = create<CheckinState>((set, get) => ({
 
   reset: () =>
     set({
+      gender: null,
       activeZone: null,
       hoveredZone: null,
       isZoomed: false,
