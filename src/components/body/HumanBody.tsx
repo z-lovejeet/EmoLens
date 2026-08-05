@@ -7,7 +7,7 @@ import { useGLTF } from '@react-three/drei';
 import { useFrame, type ThreeEvent } from '@react-three/fiber';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useCheckinStore, type ZoneId, ZONE_LABELS } from '@/lib/store/checkinStore';
-import { hitToZone, normalizeGLBScene, ZONE_CENTERS } from '@/lib/three/zoneMapping';
+import { hitToZone, normalizeGLBScene, getZoneCenter } from '@/lib/three/zoneMapping';
 import { ZoneLabel } from './ZoneLabel';
 import { ZoneBadge } from './ZoneBadge';
 
@@ -146,10 +146,10 @@ export function HumanBody() {
     // Remove scale & offset transform to get standardized height (0..1.75)
     localPoint.sub(offset).divideScalar(scale);
 
-    const zone = hitToZone(localPoint);
+    const zone = hitToZone(localPoint, bodyType);
     setHoveredZone(zone);
     document.body.style.cursor = 'pointer';
-  }, [activeZone, scale, offset, setHoveredZone]);
+  }, [activeZone, bodyType, scale, offset, setHoveredZone]);
 
   const handlePointerOut = useCallback(() => {
     if (!activeZone) {
@@ -168,14 +168,14 @@ export function HumanBody() {
     }
     localPoint.sub(offset).divideScalar(scale);
 
-    const zone = hitToZone(localPoint);
+    const zone = hitToZone(localPoint, bodyType);
     selectZone(zone);
-  }, [activeZone, scale, offset, selectZone]);
+  }, [activeZone, bodyType, scale, offset, selectZone]);
 
   if (!bodyType) return null;
 
-  const activeZoneCenter = activeZone ? ZONE_CENTERS[activeZone] : null;
-  const hoveredZoneCenter = hoveredZone && !activeZone ? ZONE_CENTERS[hoveredZone] : null;
+  const activeZoneCenter = activeZone ? getZoneCenter(activeZone, bodyType) : null;
+  const hoveredZoneCenter = hoveredZone && !activeZone ? getZoneCenter(hoveredZone, bodyType) : null;
 
   return (
     <group ref={groupRef}>
@@ -203,7 +203,7 @@ export function HumanBody() {
       {hoveredZone && !activeZone && (
         <ZoneLabel
           label={ZONE_LABELS[hoveredZone]}
-          position={ZONE_CENTERS[hoveredZone]}
+          position={getZoneCenter(hoveredZone, bodyType)}
         />
       )}
 
@@ -211,7 +211,7 @@ export function HumanBody() {
       {Object.entries(zoneData).map(([zId, data]) => {
         const count = data.sensations.length;
         if (count === 0 || activeZone === zId) return null;
-        const center = ZONE_CENTERS[zId as ZoneId];
+        const center = getZoneCenter(zId as ZoneId, bodyType);
         return (
           <ZoneBadge
             key={zId}
