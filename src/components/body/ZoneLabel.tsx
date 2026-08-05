@@ -10,29 +10,22 @@ interface ZoneLabelProps {
 }
 
 export function ZoneLabel({ label, position }: ZoneLabelProps) {
-  // Elevate label slightly above target center so it floats above sphere highlight
-  const labelPosition: [number, number, number] = [
-    position[0],
-    position[1] + 0.12,
-    position[2] + 0.04,
-  ];
-
   return (
     <Html
-      position={labelPosition}
+      position={position}
       center
-      distanceFactor={10}
-      style={{ pointerEvents: 'none', userSelect: 'none' }}
+      distanceFactor={6}
+      sprite
+      style={{ pointerEvents: 'none' }}
     >
       <motion.div
         className={styles.label}
-        initial={{ opacity: 0, y: 6, scale: 0.92 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.92 }}
-        transition={{ duration: 0.18, ease: [0.33, 1, 0.68, 1] }}
+        initial={{ opacity: 0, y: 5 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2, ease: [0.33, 1, 0.68, 1] }}
       >
-        <span className={styles.dot} />
-        <span className={styles.text}>{label}</span>
+        {label}
       </motion.div>
     </Html>
   );
