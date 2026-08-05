@@ -123,12 +123,9 @@ export function BodyModel() {
   const bodyType = useCheckinStore((s) => s.bodyType);
   const zones = useMemo(() => createBodyGeometries(), []);
 
-  // Don't render anything if no body type selected
-  if (!bodyType) return null;
-
   // Entrance animation
   useEffect(() => {
-    if (!groupRef.current || reduced) return;
+    if (!groupRef.current || reduced || !bodyType) return;
     groupRef.current.scale.set(0.95, 0.95, 0.95);
     gsap.to(groupRef.current.scale, {
       x: 1, y: 1, z: 1,
@@ -139,7 +136,7 @@ export function BodyModel() {
 
   // Idle float
   useEffect(() => {
-    if (!groupRef.current || reduced) return;
+    if (!groupRef.current || reduced || !bodyType) return;
     const tween = gsap.to(groupRef.current.position, {
       y: '+=0.03',
       duration: 4.0,
@@ -149,6 +146,9 @@ export function BodyModel() {
     });
     return () => { tween.kill(); };
   }, [reduced, bodyType]);
+
+  // Don't render anything if no body type selected
+  if (!bodyType) return null;
 
   return (
     <group ref={groupRef}>
