@@ -2,7 +2,9 @@ import { create } from 'zustand';
 
 export type ZoneId =
   | 'head' | 'throat' | 'chest' | 'stomach' | 'back'
+  | 'shoulder_l' | 'shoulder_r'
   | 'arm_l' | 'arm_r' | 'hand_l' | 'hand_r'
+  | 'hips'
   | 'leg_l' | 'leg_r' | 'foot_l' | 'foot_r';
 
 export interface SensationEntry {
@@ -15,17 +17,13 @@ export interface ZoneData {
 }
 
 interface CheckinState {
-  // Zone interaction
   activeZone: ZoneId | null;
   hoveredZone: ZoneId | null;
   isZoomed: boolean;
   zoneData: Record<ZoneId, ZoneData>;
-
-  // AI processing
   isProcessing: boolean;
   context: string;
 
-  // Actions
   selectZone: (zone: ZoneId) => void;
   deselectZone: () => void;
   setHoveredZone: (zone: ZoneId | null) => void;
@@ -39,13 +37,15 @@ interface CheckinState {
   reset: () => void;
 }
 
+const ALL_ZONES: ZoneId[] = [
+  'head', 'throat', 'shoulder_l', 'shoulder_r',
+  'chest', 'stomach', 'back', 'hips',
+  'arm_l', 'arm_r', 'hand_l', 'hand_r',
+  'leg_l', 'leg_r', 'foot_l', 'foot_r',
+];
+
 const createEmptyZoneData = (): Record<ZoneId, ZoneData> => {
-  const zones: ZoneId[] = [
-    'head', 'throat', 'chest', 'stomach', 'back',
-    'arm_l', 'arm_r', 'hand_l', 'hand_r',
-    'leg_l', 'leg_r', 'foot_l', 'foot_r',
-  ];
-  return zones.reduce((acc, z) => {
+  return ALL_ZONES.reduce((acc, z) => {
     acc[z] = { sensations: [] };
     return acc;
   }, {} as Record<ZoneId, ZoneData>);
@@ -114,13 +114,15 @@ export const useCheckinStore = create<CheckinState>((set, get) => ({
     }),
 }));
 
-// Zone display names
 export const ZONE_LABELS: Record<ZoneId, string> = {
   head: 'Head',
   throat: 'Throat',
+  shoulder_l: 'Left Shoulder',
+  shoulder_r: 'Right Shoulder',
   chest: 'Chest',
   stomach: 'Stomach',
-  back: 'Back',
+  back: 'Upper Back',
+  hips: 'Hips & Glutes',
   arm_l: 'Left Arm',
   arm_r: 'Right Arm',
   hand_l: 'Left Hand',
