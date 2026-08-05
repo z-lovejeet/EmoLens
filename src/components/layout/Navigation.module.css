@@ -67,8 +67,7 @@
 .rightControls {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  margin-left: auto;
+  gap: var(--space-2);
 }
 
 .themeToggle {

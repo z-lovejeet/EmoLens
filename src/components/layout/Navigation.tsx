@@ -70,7 +70,7 @@ export function Navigation() {
           })}
         </div>
 
-        {/* Right side controls (Theme Toggle + Auth Button on far right) */}
+        {/* Right controls */}
         <div className={styles.rightControls}>
           <motion.button
             className={styles.themeToggle}
@@ -99,6 +99,7 @@ export function Navigation() {
             </AnimatePresence>
           </motion.button>
 
+          {/* Auth button (far right) */}
           <AuthButton />
         </div>
       </div>
