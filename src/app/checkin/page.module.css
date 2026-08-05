@@ -1,0 +1,107 @@
+.main {
+  width: 100%;
+  height: calc(100vh - 64px);
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+@media (min-width: 1024px) {
+  .main {
+    height: calc(100vh - 56px);
+    padding-top: 56px; /* account for top nav */
+  }
+}
+
+@media (max-width: 1023px) {
+  .main {
+    padding-bottom: 64px; /* account for bottom nav */
+  }
+}
+
+.sceneWrapper {
+  flex: 1;
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* Back button + zone info overlay */
+.overlay {
+  position: absolute;
+  top: var(--space-4);
+  left: var(--space-4);
+  right: var(--space-4);
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  z-index: var(--z-dropdown);
+  pointer-events: none;
+}
+
+.overlay > * {
+  pointer-events: auto;
+}
+
+.backBtn {
+  background: var(--surface-overlay) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: var(--radius-md) !important;
+}
+
+.zoneInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.zoneName {
+  font-family: var(--font-outfit);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.zoneHint {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin: 0;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Instructions at bottom when not zoomed */
+.instructions {
+  position: absolute;
+  bottom: var(--space-8);
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  z-index: var(--z-dropdown);
+  pointer-events: none;
+}
+
+.instructions p {
+  font-family: var(--font-inter);
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+  margin: 0;
+  padding: var(--space-2) var(--space-4);
+  background: var(--surface-overlay);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-subtle);
+  white-space: nowrap;
+}
+
+.sensationCount {
+  margin-top: var(--space-2) !important;
+  font-weight: 500;
+  color: var(--text-accent) !important;
+}
