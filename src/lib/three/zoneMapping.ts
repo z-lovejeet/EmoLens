@@ -28,7 +28,7 @@ export const ZONE_SPHERE_RADIUS: Record<ZoneId, number> = {
   foot_r: 0.065,
 };
 
-// ── MALE ZONE CENTERS (Viewer Facing Front: Model Right is -X, Model Left is +X) ──
+// ── MALE ZONE CENTERS ──
 export const MALE_ZONE_CENTERS: Record<ZoneId, [number, number, number]> = {
   head: [0, 1.643, 0.02],
   throat: [0, 1.494, 0.02],
@@ -37,7 +37,7 @@ export const MALE_ZONE_CENTERS: Record<ZoneId, [number, number, number]> = {
   chest: [0, 1.300, 0.08],
   stomach: [0, 1.050, 0.05],
   back: [0, 1.235, -0.08],
-  hips: [0, 0.894, -0.08],          // Hips & Glutes center situated on rear Z < 0
+  hips: [0, 0.894, -0.08],
   arm_l: [0.280, 1.120, 0.0],
   arm_r: [-0.280, 1.120, 0.0],
   hand_l: [0.310, 0.840, 0.0],
@@ -57,7 +57,7 @@ export const FEMALE_ZONE_CENTERS: Record<ZoneId, [number, number, number]> = {
   chest: [0, 1.300, 0.08],
   stomach: [0, 1.050, 0.05],
   back: [0, 1.236, -0.08],
-  hips: [0, 0.887, -0.08],          // Hips & Glutes center situated on rear Z < 0
+  hips: [0, 0.887, -0.08],
   arm_l: [0.262, 1.083, -0.01],
   arm_r: [-0.261, 1.084, -0.01],
   hand_l: [0.326, 0.861, -0.01],
@@ -77,11 +77,13 @@ export function getZoneCenter(zoneId: ZoneId, bodyType: BodyType | null): [numbe
 
 /**
  * Maps a 3D hit point in normalized model coordinates (Y 0..1.75) to body ZoneId.
- * Hips and Glutes are ONLY selectable from behind (z < -0.02).
+ * - Front View (Z >= -0.02): Torso maps exclusively to Chest (Y >= 1.20) or Stomach (Y < 1.20).
+ * - Rear View (Z < -0.02): Torso maps exclusively to Back (Y >= 0.98) or Hips & Glutes (Y < 0.98).
  */
 export function hitToZone(point: THREE.Vector3, bodyType: BodyType | null): ZoneId {
   const { x, y, z } = point;
   const isFemale = bodyType === 'female';
+  const isRear = z < -0.02;
 
   // 1. Head (Y >= 1.56)
   if (y >= 1.56) {
@@ -98,31 +100,30 @@ export function hitToZone(point: THREE.Vector3, bodyType: BodyType | null): Zone
   if (y >= 1.32 && y < 1.44) {
     if (x > shoulderX) return 'shoulder_l';
     if (x < -shoulderX) return 'shoulder_r';
-    return z < -0.02 ? 'back' : 'chest';
+    return isRear ? 'back' : 'chest';
   }
 
-  // 4. Chest / Upper Arms (Y: 1.20 -> 1.32)
+  // 4. Chest vs Back & Upper Arms (Y: 1.20 -> 1.32)
   const armX = isFemale ? 0.20 : 0.22;
   if (y >= 1.20 && y < 1.32) {
     if (x > armX) return 'arm_l';
     if (x < -armX) return 'arm_r';
-    return z < -0.02 ? 'back' : 'chest';
+    return isRear ? 'back' : 'chest';
   }
 
-  // 5. Stomach / Mid Back / Arms (Y: 0.98 -> 1.20)
+  // 5. Stomach vs Back & Arms (Y: 0.98 -> 1.20)
   if (y >= 0.98 && y < 1.20) {
     if (x > armX) return 'arm_l';
     if (x < -armX) return 'arm_r';
-    return z < -0.02 ? 'back' : 'stomach';
+    return isRear ? 'back' : 'stomach';
   }
 
-  // 6. Lower Torso / Hips & Glutes vs Stomach / Hands (Y: 0.78 -> 0.98)
+  // 6. Stomach vs Hips & Glutes & Hands (Y: 0.78 -> 0.98)
   const handX = isFemale ? 0.20 : 0.22;
   if (y >= 0.78 && y < 0.98) {
     if (x > handX) return 'hand_l';
     if (x < -handX) return 'hand_r';
-    // Hips & Glutes ONLY selectable from behind (z < -0.02)
-    return z < -0.02 ? 'hips' : 'stomach';
+    return isRear ? 'hips' : 'stomach';
   }
 
   // 7. Legs (Y: 0.16 -> 0.78)
