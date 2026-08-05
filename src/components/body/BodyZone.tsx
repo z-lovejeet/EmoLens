@@ -3,9 +3,9 @@
 import { useRef, useMemo, useCallback } from 'react';
 import * as THREE from 'three';
 import { useFrame, type ThreeEvent } from '@react-three/fiber';
-import gsap from 'gsap';
 import { useCheckinStore, type ZoneId, ZONE_LABELS } from '@/lib/store/checkinStore';
-import { ZONE_MATERIALS, INTENSITY_COLORS } from '@/lib/three/materials';
+import { INTENSITY_COLORS } from '@/lib/three/materials';
+import { bodyVertexShader, bodyFragmentShader, createBodyUniforms } from '@/lib/three/bodyShader';
 import { ZoneBadge } from './ZoneBadge';
 import { ZoneLabel } from './ZoneLabel';
 
@@ -18,11 +18,14 @@ interface BodyZoneProps {
 
 export function BodyZone({ zoneId, geometry, position, center }: BodyZoneProps) {
   const meshRef = useRef<THREE.Mesh>(null);
-  const materialRef = useRef<THREE.MeshStandardMaterial>(null);
-  const fresnelRef = useRef<THREE.ShaderMaterial>(null);
-  const glowTween = useRef<gsap.core.Tween | null>(null);
+  const materialRef = useRef<THREE.ShaderMaterial>(null);
+  const wireframeRef = useRef<THREE.MeshBasicMaterial>(null);
 
-  const { activeZone, hoveredZone, zoneData, selectZone, setHoveredZone } = useCheckinStore();
+  const activeZone = useCheckinStore((s) => s.activeZone);
+  const hoveredZone = useCheckinStore((s) => s.hoveredZone);
+  const zoneData = useCheckinStore((s) => s.zoneData);
+  const selectZone = useCheckinStore((s) => s.selectZone);
+  const setHoveredZone = useCheckinStore((s) => s.setHoveredZone);
 
   const sensations = zoneData[zoneId].sensations;
   const sensationCount = sensations.length;
@@ -31,71 +34,48 @@ export function BodyZone({ zoneId, geometry, position, center }: BodyZoneProps) 
   const isCompleted = sensationCount > 0 && activeZone !== zoneId;
   const isAnyZoneActive = activeZone !== null;
 
-  // Compute average intensity for completed zones
   const avgIntensity = useMemo(() => {
     if (sensationCount === 0) return 0;
     const sum = sensations.reduce((acc, s) => acc + s.intensity, 0);
     return Math.round(sum / sensationCount) as 1 | 2 | 3 | 4 | 5;
   }, [sensations, sensationCount]);
 
-  // Determine zone state
-  const zoneState = useMemo(() => {
-    if (isActive) return 'selected';
-    if (isCompleted) return 'completed';
-    if (isHovered && !isAnyZoneActive) return 'hovered';
-    return 'idle';
-  }, [isActive, isCompleted, isHovered, isAnyZoneActive]);
+  // Each zone gets its own uniforms instance
+  const uniforms = useMemo(() => createBodyUniforms(), []);
 
-  // Apply material properties based on state
-  useFrame(() => {
+  // Update shader uniforms every frame
+  useFrame(({ clock }) => {
     if (!materialRef.current) return;
-    const mat = materialRef.current;
-    const target = ZONE_MATERIALS[zoneState === 'completed' ? 'completed' : zoneState];
+    const u = materialRef.current.uniforms;
 
-    // Lerp material properties for smooth transitions
-    mat.color.lerp(target.color, 0.1);
-    mat.roughness += (target.roughness - mat.roughness) * 0.1;
-    mat.metalness += (target.metalness - mat.metalness) * 0.1;
+    u.uTime.value = clock.getElapsedTime();
 
-    if (zoneState === 'completed' && avgIntensity > 0) {
-      const intensityColor = INTENSITY_COLORS[avgIntensity] || INTENSITY_COLORS[1];
-      mat.emissive.lerp(intensityColor, 0.1);
-      mat.emissiveIntensity += (target.emissiveIntensity - mat.emissiveIntensity) * 0.1;
-    } else if (zoneState !== 'selected') {
-      mat.emissive.lerp(
-        'emissive' in target ? target.emissive : new THREE.Color('#000000'),
-        0.1
-      );
-      mat.emissiveIntensity += (
-        ('emissiveIntensity' in target ? target.emissiveIntensity : 0) - mat.emissiveIntensity
-      ) * 0.1;
+    // Smooth lerp hover state
+    const targetHovered = (isHovered && !isAnyZoneActive) ? 1.0 : 0.0;
+    u.uHovered.value += (targetHovered - u.uHovered.value) * 0.1;
+
+    // Smooth lerp selected state
+    const targetSelected = isActive ? 1.0 : 0.0;
+    u.uSelected.value += (targetSelected - u.uSelected.value) * 0.1;
+
+    // Smooth lerp completed state
+    const targetCompleted = isCompleted ? 1.0 : 0.0;
+    u.uCompleted.value += (targetCompleted - u.uCompleted.value) * 0.08;
+
+    // Update intensity color for completed zones
+    if (isCompleted && avgIntensity > 0) {
+      const color = INTENSITY_COLORS[avgIntensity] || INTENSITY_COLORS[1];
+      (u.uIntensityColor.value as THREE.Color).lerp(color, 0.08);
     }
 
-    // Fresnel overlay for hover
-    if (fresnelRef.current) {
-      const targetIntensity = isHovered && !isAnyZoneActive ? 0.6 : 0;
-      fresnelRef.current.uniforms.uIntensity.value +=
-        (targetIntensity - fresnelRef.current.uniforms.uIntensity.value) * 0.1;
-    }
-  });
+    // Dim non-active zones when a zone is selected
+    const targetOpacity = (isAnyZoneActive && !isActive) ? 0.2 : 0.92;
+    u.uOpacity.value += (targetOpacity - u.uOpacity.value) * 0.08;
 
-  // Glow pulse for selected zone
-  useFrame(() => {
-    if (!materialRef.current) return;
-
-    if (isActive && !glowTween.current) {
-      glowTween.current = gsap.to(materialRef.current, {
-        emissiveIntensity: 0.7,
-        duration: 2.0,
-        ease: 'sine.inOut',
-        yoyo: true,
-        repeat: -1,
-        startAt: { emissiveIntensity: 0.4 },
-      });
-      materialRef.current.emissive.set('#8ecae6');
-    } else if (!isActive && glowTween.current) {
-      glowTween.current.kill();
-      glowTween.current = null;
+    // Wireframe opacity — brighter on hover
+    if (wireframeRef.current) {
+      const targetWire = (isHovered && !isAnyZoneActive) ? 0.18 : 0.035;
+      wireframeRef.current.opacity += (targetWire - wireframeRef.current.opacity) * 0.1;
     }
   });
 
@@ -120,11 +100,9 @@ export function BodyZone({ zoneId, geometry, position, center }: BodyZoneProps) 
     document.body.style.cursor = 'auto';
   }, [setHoveredZone]);
 
-  // Dim non-active zones when a zone is selected
-  const opacity = isAnyZoneActive && !isActive ? 0.4 : 1.0;
-
   return (
     <group position={position}>
+      {/* Primary body mesh — custom SSS + Fresnel shader */}
       <mesh
         ref={meshRef}
         geometry={geometry}
@@ -132,44 +110,43 @@ export function BodyZone({ zoneId, geometry, position, center }: BodyZoneProps) 
         onPointerOver={handlePointerOver}
         onPointerOut={handlePointerOut}
       >
-        <meshStandardMaterial
+        <shaderMaterial
           ref={materialRef}
-          color={ZONE_MATERIALS.idle.color}
-          roughness={ZONE_MATERIALS.idle.roughness}
-          metalness={ZONE_MATERIALS.idle.metalness}
-          emissive={ZONE_MATERIALS.idle.emissive}
-          emissiveIntensity={ZONE_MATERIALS.idle.emissiveIntensity}
-          transparent={isAnyZoneActive && !isActive}
-          opacity={opacity}
-        />
-      </mesh>
-
-      {/* Fresnel rim glow overlay */}
-      <mesh geometry={geometry} position={position ? undefined : undefined}>
-        <fresnelMaterial
-          ref={fresnelRef}
+          uniforms={uniforms}
+          vertexShader={bodyVertexShader}
+          fragmentShader={bodyFragmentShader}
           transparent
-          depthWrite={false}
+          depthWrite
           side={THREE.FrontSide}
-          uColor={new THREE.Color('#8ecae6')}
-          uIntensity={0}
-          uPower={2.5}
         />
       </mesh>
 
-      {/* Badge - sensation count */}
+      {/* Wireframe holographic overlay */}
+      <mesh geometry={geometry} scale={[1.003, 1.003, 1.003]}>
+        <meshBasicMaterial
+          ref={wireframeRef}
+          color="#8ecae6"
+          wireframe
+          transparent
+          opacity={0.035}
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+        />
+      </mesh>
+
+      {/* Sensation count badge */}
       {sensationCount > 0 && !isActive && (
         <ZoneBadge
           count={sensationCount}
-          position={[center[0], center[1] + 0.15, center[2]]}
+          position={[center[0], center[1] + 0.22, center[2] + 0.1]}
         />
       )}
 
-      {/* Label on hover */}
+      {/* Zone label on hover */}
       {isHovered && !isAnyZoneActive && (
         <ZoneLabel
           label={ZONE_LABELS[zoneId]}
-          position={[center[0], center[1] + 0.2, center[2]]}
+          position={[center[0], center[1] + 0.28, center[2] + 0.1]}
         />
       )}
     </group>
