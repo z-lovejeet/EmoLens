@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Scan, BookOpen, Sun, Moon } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { getInitialTheme, toggleTheme, type Theme } from '@/lib/theme';
+import { AuthButton } from '@/components/auth/AuthButton';
 import styles from './Navigation.module.css';
 
 const NAV_ITEMS = [
@@ -68,6 +69,9 @@ export function Navigation() {
             );
           })}
         </div>
+
+        {/* Auth button */}
+        <AuthButton />
 
         {/* Theme toggle */}
         <motion.button
