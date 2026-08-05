@@ -3,9 +3,15 @@
   height: 100%;
   min-height: 500px;
   position: relative;
-  border-radius: var(--radius-lg, 12px);
   overflow: hidden;
   touch-action: none;
+  background: #0a0a0f;
+}
+
+.container canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 @media (max-width: 768px) {
