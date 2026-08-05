@@ -221,11 +221,15 @@ export function HumanBody() {
         <HighlightSphere zoneId={activeZone} center={activeZoneCenter} isSelected />
       )}
 
-      {/* Hover Zone Label */}
+      {/* Hover Zone Label — dynamically floated right above the sphere */}
       {hoveredZone && !activeZone && hoveredZoneCenter && (
         <ZoneLabel
           label={ZONE_LABELS[hoveredZone]}
-          position={hoveredZoneCenter}
+          position={[
+            hoveredZoneCenter[0],
+            hoveredZoneCenter[1] + (ZONE_SPHERE_RADIUS[hoveredZone] || 0.10) + 0.05,
+            hoveredZoneCenter[2],
+          ]}
         />
       )}
 
