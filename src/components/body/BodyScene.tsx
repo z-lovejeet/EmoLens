@@ -37,6 +37,7 @@ function SceneContent() {
 
       {/* Orbit controls — only when not zoomed */}
       <OrbitControls
+        makeDefault
         enabled={!isZoomed}
         enablePan={false}
         enableZoom={false}
@@ -45,7 +46,7 @@ function SceneContent() {
         rotateSpeed={0.4}
         dampingFactor={0.06}
         enableDamping
-        target={[0, 0.8, 0]}
+        target={[0, 0.88, 0]}
       />
 
       {/* ── Premium 5-Light Studio Rig ── */}
