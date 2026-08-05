@@ -12,18 +12,19 @@ export function CameraController() {
   const { camera, controls } = useThree();
   const reduced = useReducedMotion();
   const activeZone = useCheckinStore((s) => s.activeZone);
+  const activeZoneIsRear = useCheckinStore((s) => s.activeZoneIsRear);
   const bodyType = useCheckinStore((s) => s.bodyType);
   const prevZone = useRef<string | null>(null);
 
   // Smoothly animate camera & controls, then lock when selected
   useEffect(() => {
-    if (prevZone.current === activeZone) return;
-    prevZone.current = activeZone;
-
     const cameraPositions = getCameraPositions(bodyType);
-    const target = activeZone
-      ? cameraPositions[activeZone]
-      : cameraPositions.full;
+    const key = activeZone
+      ? activeZoneIsRear && cameraPositions[`${activeZone}_rear`]
+        ? `${activeZone}_rear`
+        : activeZone
+      : 'full';
+    const target = cameraPositions[key] || cameraPositions.full;
 
     if (!target) return;
 
@@ -65,7 +66,7 @@ export function CameraController() {
         onUpdate: () => camera.updateProjectionMatrix(),
       });
     }
-  }, [activeZone, bodyType, camera, controls, reduced]);
+  }, [activeZone, activeZoneIsRear, bodyType, camera, controls, reduced]);
 
   return null;
 }
