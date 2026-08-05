@@ -8,64 +8,64 @@ export interface ZoneBounds {
   center: [number, number, number];
 }
 
-// ── PER-ZONE SPHERE RADIUS (Scaled according to muscle/body part surface area) ──
+// ── PER-ZONE SPHERE RADIUS (Tightly scaled to clean joint/muscle sizes) ──
 export const ZONE_SPHERE_RADIUS: Record<ZoneId, number> = {
-  head: 0.10,
-  throat: 0.05,
-  shoulder_l: 0.09,
-  shoulder_r: 0.09,
-  chest: 0.15,
-  stomach: 0.14,
-  back: 0.16,
-  hips: 0.14,
-  arm_l: 0.09,
-  arm_r: 0.09,
-  hand_l: 0.065,
-  hand_r: 0.065,
-  leg_l: 0.12,
-  leg_r: 0.12,
-  foot_l: 0.065,
-  foot_r: 0.065,
+  head: 0.075,
+  throat: 0.040,
+  shoulder_l: 0.055,
+  shoulder_r: 0.055,
+  chest: 0.100,
+  stomach: 0.090,
+  back: 0.110,
+  hips: 0.100,
+  arm_l: 0.060,
+  arm_r: 0.060,
+  hand_l: 0.045,
+  hand_r: 0.045,
+  leg_l: 0.080,
+  leg_r: 0.080,
+  foot_l: 0.045,
+  foot_r: 0.045,
 };
 
-// ── MALE ZONE CENTERS (Standardized World Space: Feet Y=0, Head Y=1.75) ──
+// ── MALE ZONE CENTERS (Measured directly from male mesh geometry) ──
 export const MALE_ZONE_CENTERS: Record<ZoneId, [number, number, number]> = {
   head: [0, 1.643, 0.02],
   throat: [0, 1.494, 0.02],
-  shoulder_l: [0.260, 1.380, 0.0],
-  shoulder_r: [-0.260, 1.380, 0.0],
-  chest: [0, 1.280, 0.08],
+  shoulder_l: [0.210, 1.380, 0.02],  // Model Left (Viewer Right)
+  shoulder_r: [-0.210, 1.380, 0.02], // Model Right (Viewer Left)
+  chest: [0, 1.300, 0.08],
   stomach: [0, 1.080, 0.05],
   back: [0, 1.235, -0.08],
   hips: [0, 0.894, -0.08],
-  arm_l: [0.280, 1.120, 0.0],
-  arm_r: [-0.280, 1.120, 0.0],
-  hand_l: [0.310, 0.840, 0.0],
-  hand_r: [-0.310, 0.840, 0.0],
+  arm_l: [0.260, 1.120, 0.0],
+  arm_r: [-0.260, 1.120, 0.0],
+  hand_l: [0.290, 0.840, 0.0],
+  hand_r: [-0.290, 0.840, 0.0],
   leg_l: [0.100, 0.520, 0.02],
   leg_r: [-0.100, 0.520, 0.02],
   foot_l: [0.100, 0.080, 0.06],
   foot_r: [-0.100, 0.080, 0.06],
 };
 
-// ── FEMALE ZONE CENTERS (Standardized World Space: Feet Y=0, Head Y=1.75) ──
+// ── FEMALE ZONE CENTERS (Measured directly from female mesh geometry) ──
 export const FEMALE_ZONE_CENTERS: Record<ZoneId, [number, number, number]> = {
   head: [0, 1.620, 0.04],
   throat: [0, 1.499, 0.00],
-  shoulder_l: [0.210, 1.340, 0.0],
-  shoulder_r: [-0.210, 1.340, 0.0],
+  shoulder_l: [0.170, 1.380, 0.02],  // Model Left (Viewer Right: +X)
+  shoulder_r: [-0.170, 1.380, 0.02], // Model Right (Viewer Left: -X)
   chest: [0, 1.280, 0.08],
   stomach: [0, 1.083, 0.04],
   back: [0, 1.280, -0.06],
   hips: [0, 0.895, -0.06],
-  arm_l: [0.252, 1.102, -0.02],
-  arm_r: [-0.252, 1.100, -0.02],
-  hand_l: [0.326, 0.872, -0.02],
-  hand_r: [-0.326, 0.872, -0.02],
-  leg_l: [0.094, 0.534, 0.01],
-  leg_r: [-0.095, 0.530, 0.01],
-  foot_l: [0.074, 0.048, 0.05],
-  foot_r: [-0.074, 0.048, 0.05],
+  arm_l: [0.220, 1.100, -0.01],
+  arm_r: [-0.220, 1.100, -0.01],
+  hand_l: [0.280, 0.850, -0.01],
+  hand_r: [-0.280, 0.850, -0.01],
+  leg_l: [0.090, 0.530, 0.01],
+  leg_r: [-0.090, 0.530, 0.01],
+  foot_l: [0.075, 0.050, 0.05],
+  foot_r: [-0.075, 0.050, 0.05],
 };
 
 export function getZoneCenter(zoneId: ZoneId, bodyType: BodyType | null): [number, number, number] {
@@ -104,7 +104,7 @@ export function hitToZone(point: THREE.Vector3, bodyType: BodyType | null): Zone
   }
 
   // 4. Chest vs Back & Upper Arms (Y: 1.18 -> 1.30)
-  const armX = isFemale ? 0.18 : 0.22;
+  const armX = isFemale ? 0.17 : 0.20;
   if (y >= 1.18 && y < 1.30) {
     if (x > armX) return 'arm_l';
     if (x < -armX) return 'arm_r';
@@ -119,7 +119,7 @@ export function hitToZone(point: THREE.Vector3, bodyType: BodyType | null): Zone
   }
 
   // 6. Stomach vs Hips & Glutes & Hands (Y: 0.78 -> 0.98)
-  const handX = isFemale ? 0.18 : 0.22;
+  const handX = isFemale ? 0.17 : 0.20;
   if (y >= 0.78 && y < 0.98) {
     if (x > handX) return 'hand_l';
     if (x < -handX) return 'hand_r';
