@@ -96,7 +96,7 @@ export const MALE_CAMERA_POSITIONS: Record<string, CameraTarget> = {
   },
 };
 
-// ── FEMALE CAMERA RIG ──
+// ── FEMALE CAMERA RIG (Calibrated precisely to female geometry centers) ──
 export const FEMALE_CAMERA_POSITIONS: Record<string, CameraTarget> = {
   full: {
     position: new THREE.Vector3(0, 0.88, 4.2),
@@ -109,23 +109,23 @@ export const FEMALE_CAMERA_POSITIONS: Record<string, CameraTarget> = {
     fov: 32,
   },
   throat: {
-    position: new THREE.Vector3(0, 1.49, 2.4),
-    lookAt: new THREE.Vector3(0, 1.49, 0),
+    position: new THREE.Vector3(0, 1.50, 2.4),
+    lookAt: new THREE.Vector3(0, 1.50, 0),
     fov: 32,
   },
   shoulder_l: {
-    position: new THREE.Vector3(0.35, 1.36, 2.6),
-    lookAt: new THREE.Vector3(0.22, 1.36, 0),
+    position: new THREE.Vector3(0.35, 1.34, 2.6),
+    lookAt: new THREE.Vector3(0.21, 1.34, 0),
     fov: 34,
   },
   shoulder_r: {
-    position: new THREE.Vector3(-0.35, 1.36, 2.6),
-    lookAt: new THREE.Vector3(-0.22, 1.36, 0),
+    position: new THREE.Vector3(-0.35, 1.34, 2.6),
+    lookAt: new THREE.Vector3(-0.21, 1.34, 0),
     fov: 34,
   },
   chest: {
-    position: new THREE.Vector3(0, 1.30, 2.8),
-    lookAt: new THREE.Vector3(0, 1.30, 0),
+    position: new THREE.Vector3(0, 1.28, 2.8),
+    lookAt: new THREE.Vector3(0, 1.28, 0),
     fov: 34,
   },
   stomach: {
@@ -134,43 +134,43 @@ export const FEMALE_CAMERA_POSITIONS: Record<string, CameraTarget> = {
     fov: 34,
   },
   back: {
-    position: new THREE.Vector3(0, 1.23, -2.8),
-    lookAt: new THREE.Vector3(0, 1.23, 0),
+    position: new THREE.Vector3(0, 1.28, -2.8),
+    lookAt: new THREE.Vector3(0, 1.28, 0),
     fov: 34,
   },
   hips: {
-    position: new THREE.Vector3(0, 0.88, -2.8),
-    lookAt: new THREE.Vector3(0, 0.88, 0),
+    position: new THREE.Vector3(0, 0.89, -2.8),
+    lookAt: new THREE.Vector3(0, 0.89, 0),
     fov: 34,
   },
   arm_l: {
-    position: new THREE.Vector3(0.45, 1.08, 2.6),
-    lookAt: new THREE.Vector3(0.26, 1.08, 0),
+    position: new THREE.Vector3(0.45, 1.10, 2.6),
+    lookAt: new THREE.Vector3(0.25, 1.10, 0),
     fov: 34,
   },
   arm_r: {
-    position: new THREE.Vector3(-0.45, 1.08, 2.6),
-    lookAt: new THREE.Vector3(-0.26, 1.08, 0),
+    position: new THREE.Vector3(-0.45, 1.10, 2.6),
+    lookAt: new THREE.Vector3(-0.25, 1.10, 0),
     fov: 34,
   },
   hand_l: {
-    position: new THREE.Vector3(0.45, 0.86, 2.6),
-    lookAt: new THREE.Vector3(0.32, 0.86, 0),
+    position: new THREE.Vector3(0.45, 0.87, 2.6),
+    lookAt: new THREE.Vector3(0.32, 0.87, 0),
     fov: 34,
   },
   hand_r: {
-    position: new THREE.Vector3(-0.45, 0.86, 2.6),
-    lookAt: new THREE.Vector3(-0.32, 0.86, 0),
+    position: new THREE.Vector3(-0.45, 0.87, 2.6),
+    lookAt: new THREE.Vector3(-0.32, 0.87, 0),
     fov: 34,
   },
   leg_l: {
-    position: new THREE.Vector3(0.22, 0.55, 2.8),
-    lookAt: new THREE.Vector3(0.10, 0.55, 0),
+    position: new THREE.Vector3(0.22, 0.53, 2.8),
+    lookAt: new THREE.Vector3(0.09, 0.53, 0),
     fov: 34,
   },
   leg_r: {
-    position: new THREE.Vector3(-0.22, 0.55, 2.8),
-    lookAt: new THREE.Vector3(-0.10, 0.55, 0),
+    position: new THREE.Vector3(-0.22, 0.53, 2.8),
+    lookAt: new THREE.Vector3(-0.09, 0.53, 0),
     fov: 34,
   },
   foot_l: {
