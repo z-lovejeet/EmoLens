@@ -5,9 +5,16 @@ export type BodyType = 'male' | 'female';
 export type ZoneId =
   | 'head' | 'throat' | 'chest' | 'stomach' | 'back'
   | 'shoulder_l' | 'shoulder_r'
-  | 'arm_l' | 'arm_r' | 'hand_l' | 'hand_r'
+  | 'upper_arm_l' | 'upper_arm_r'
+  | 'elbow_l' | 'elbow_r'
+  | 'forearm_l' | 'forearm_r'
+  | 'hand_l' | 'hand_r'
   | 'hips'
-  | 'leg_l' | 'leg_r' | 'foot_l' | 'foot_r';
+  | 'thigh_l' | 'thigh_r'
+  | 'hamstring_l' | 'hamstring_r'
+  | 'knee_l' | 'knee_r'
+  | 'calf_l' | 'calf_r'
+  | 'foot_l' | 'foot_r';
 
 export interface SensationEntry {
   type: string;
@@ -21,13 +28,14 @@ export interface ZoneData {
 interface CheckinState {
   bodyType: BodyType | null;
   activeZone: ZoneId | null;
+  activeZoneIsRear: boolean;
   hoveredZone: ZoneId | null;
   isZoomed: boolean;
   zoneData: Record<ZoneId, ZoneData>;
   isProcessing: boolean;
   context: string;
 
-  selectZone: (zone: ZoneId) => void;
+  selectZone: (zone: ZoneId, isRear?: boolean) => void;
   deselectZone: () => void;
   setHoveredZone: (zone: ZoneId | null) => void;
   addSensation: (zone: ZoneId, sensation: SensationEntry) => void;
@@ -44,8 +52,12 @@ interface CheckinState {
 const ALL_ZONES: ZoneId[] = [
   'head', 'throat', 'shoulder_l', 'shoulder_r',
   'chest', 'stomach', 'back', 'hips',
-  'arm_l', 'arm_r', 'hand_l', 'hand_r',
-  'leg_l', 'leg_r', 'foot_l', 'foot_r',
+  'upper_arm_l', 'upper_arm_r',
+  'elbow_l', 'elbow_r', 'forearm_l', 'forearm_r',
+  'hand_l', 'hand_r',
+  'thigh_l', 'thigh_r', 'hamstring_l', 'hamstring_r',
+  'knee_l', 'knee_r', 'calf_l', 'calf_r',
+  'foot_l', 'foot_r',
 ];
 
 const createEmptyZoneData = (): Record<ZoneId, ZoneData> => {
@@ -58,6 +70,7 @@ const createEmptyZoneData = (): Record<ZoneId, ZoneData> => {
 export const useCheckinStore = create<CheckinState>((set, get) => ({
   bodyType: null,
   activeZone: null,
+  activeZoneIsRear: false,
   hoveredZone: null,
   isZoomed: false,
   zoneData: createEmptyZoneData(),
@@ -65,8 +78,8 @@ export const useCheckinStore = create<CheckinState>((set, get) => ({
   context: '',
 
   setBodyType: (type) => set({ bodyType: type }),
-  selectZone: (zone) => set({ activeZone: zone, isZoomed: true }),
-  deselectZone: () => set({ activeZone: null, isZoomed: false }),
+  selectZone: (zone, isRear = false) => set({ activeZone: zone, activeZoneIsRear: isRear, isZoomed: true }),
+  deselectZone: () => set({ activeZone: null, activeZoneIsRear: false, isZoomed: false }),
   setHoveredZone: (zone) => set({ hoveredZone: zone }),
 
   addSensation: (zone, sensation) =>
@@ -113,6 +126,7 @@ export const useCheckinStore = create<CheckinState>((set, get) => ({
     set({
       bodyType: null,
       activeZone: null,
+      activeZoneIsRear: false,
       hoveredZone: null,
       isZoomed: false,
       zoneData: createEmptyZoneData(),
@@ -130,12 +144,22 @@ export const ZONE_LABELS: Record<ZoneId, string> = {
   stomach: 'Stomach',
   back: 'Back',
   hips: 'Hips & Glutes',
-  arm_l: 'Left Arm',
-  arm_r: 'Right Arm',
+  upper_arm_l: 'Left Upper Arm',
+  upper_arm_r: 'Right Upper Arm',
+  elbow_l: 'Left Elbow',
+  elbow_r: 'Right Elbow',
+  forearm_l: 'Left Forearm',
+  forearm_r: 'Right Forearm',
   hand_l: 'Left Hand',
   hand_r: 'Right Hand',
-  leg_l: 'Left Leg',
-  leg_r: 'Right Leg',
+  thigh_l: 'Left Thigh',
+  thigh_r: 'Right Thigh',
+  hamstring_l: 'Left Hamstring',
+  hamstring_r: 'Right Hamstring',
+  knee_l: 'Left Knee',
+  knee_r: 'Right Knee',
+  calf_l: 'Left Lower Leg',
+  calf_r: 'Right Lower Leg',
   foot_l: 'Left Foot',
   foot_r: 'Right Foot',
 };
