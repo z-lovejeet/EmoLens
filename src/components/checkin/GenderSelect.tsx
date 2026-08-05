@@ -2,8 +2,7 @@
 
 import { useState } from 'react';
 import styles from './GenderSelect.module.css';
-
-export type BodyType = 'male' | 'female' | 'neutral';
+import { type BodyType } from '@/lib/store/checkinStore';
 
 interface GenderSelectProps {
   onSelect: (bodyType: BodyType) => void;
@@ -15,8 +14,7 @@ export function GenderSelect({ onSelect }: GenderSelectProps) {
 
   const handleSelect = (type: BodyType) => {
     setSelected(type);
-    // Small delay for visual feedback before transitioning
-    setTimeout(() => onSelect(type), 400);
+    setTimeout(() => onSelect(type), 350);
   };
 
   return (
@@ -24,11 +22,11 @@ export function GenderSelect({ onSelect }: GenderSelectProps) {
       <div className={styles.modal}>
         <div className={styles.header}>
           <h2 className={styles.title}>Welcome to Check-In</h2>
-          <p className={styles.subtitle}>Choose a body map to begin exploring your sensations</p>
+          <p className={styles.subtitle}>Choose your body map to begin exploring sensations</p>
         </div>
 
         <div className={styles.options}>
-          {(['male', 'female', 'neutral'] as BodyType[]).map((type) => (
+          {(['male', 'female'] as BodyType[]).map((type) => (
             <button
               key={type}
               className={`${styles.option} ${hovered === type ? styles.optionHovered : ''} ${selected === type ? styles.optionSelected : ''}`}
@@ -43,17 +41,16 @@ export function GenderSelect({ onSelect }: GenderSelectProps) {
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
-                  strokeWidth="1.5"
+                  strokeWidth="1.75"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 >
-                  {type === 'male' && (
+                  {type === 'male' ? (
                     <>
                       <circle cx="12" cy="7" r="4" />
                       <path d="M5.5 21v-2a6.5 6.5 0 0 1 13 0v2" />
                     </>
-                  )}
-                  {type === 'female' && (
+                  ) : (
                     <>
                       <circle cx="12" cy="7" r="4" />
                       <path d="M5.5 21v-2a6.5 6.5 0 0 1 13 0v2" />
@@ -61,23 +58,17 @@ export function GenderSelect({ onSelect }: GenderSelectProps) {
                       <path d="M9 15h6" />
                     </>
                   )}
-                  {type === 'neutral' && (
-                    <>
-                      <circle cx="12" cy="8" r="4" />
-                      <path d="M6 21v-1a6 6 0 0 1 12 0v1" />
-                    </>
-                  )}
                 </svg>
               </div>
               <span className={styles.label}>
-                {type === 'male' ? 'Male' : type === 'female' ? 'Female' : 'Neutral'}
+                {type === 'male' ? 'Male Body' : 'Female Body'}
               </span>
             </button>
           ))}
         </div>
 
         <p className={styles.footnote}>
-          This only affects the body visualization. You can change it anytime.
+          Select male or female for tailored anatomical visualization.
         </p>
       </div>
     </div>

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type BodyType = 'male' | 'female' | 'neutral';
+export type BodyType = 'male' | 'female';
 
 export type ZoneId =
   | 'head' | 'throat' | 'chest' | 'stomach' | 'back'

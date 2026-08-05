@@ -14,7 +14,6 @@ import { ZoneBadge } from './ZoneBadge';
 const MODEL_PATHS = {
   male: '/models/male-body.glb',
   female: '/models/female-body.glb',
-  neutral: '/models/male-body.glb',
 } as const;
 
 function createPorcelainMaterial(): THREE.MeshPhysicalMaterial {
@@ -35,29 +34,52 @@ function createPorcelainMaterial(): THREE.MeshPhysicalMaterial {
   });
 }
 
-function HighlightRing({ center, isSelected }: { center: [number, number, number]; isSelected?: boolean }) {
-  const meshRef = useRef<THREE.Mesh>(null);
+/**
+ * Sleek, compact focus indicator marker for hovered or selected body zones.
+ */
+function HighlightIndicator({ center, isSelected }: { center: [number, number, number]; isSelected?: boolean }) {
+  const outerRingRef = useRef<THREE.Mesh>(null);
+  const innerDotRef = useRef<THREE.Mesh>(null);
 
   useFrame(({ clock }) => {
-    if (meshRef.current) {
-      const mat = meshRef.current.material as THREE.MeshBasicMaterial;
-      const t = clock.getElapsedTime();
-      const pulse = 0.25 + Math.sin(t * 4) * 0.1;
-      mat.opacity = isSelected ? 0.45 : pulse;
+    const t = clock.getElapsedTime();
+    if (outerRingRef.current) {
+      const mat = outerRingRef.current.material as THREE.MeshBasicMaterial;
+      const pulse = isSelected ? 0.7 + Math.sin(t * 5) * 0.2 : 0.4 + Math.sin(t * 3) * 0.15;
+      mat.opacity = pulse;
+      const scalePulse = isSelected ? 1 + Math.sin(t * 4) * 0.08 : 1 + Math.sin(t * 2) * 0.05;
+      outerRingRef.current.scale.set(scalePulse, scalePulse, scalePulse);
     }
   });
 
   return (
-    <mesh ref={meshRef} position={center}>
-      <sphereGeometry args={[0.18, 24, 24]} />
-      <meshBasicMaterial
-        color={isSelected ? '#8ecae6' : '#b8a9c9'}
-        transparent
-        opacity={0.3}
-        wireframe
-        blending={THREE.AdditiveBlending}
-      />
-    </mesh>
+    <group position={center}>
+      {/* Sleek outer ring indicator */}
+      <mesh ref={outerRingRef}>
+        <ringGeometry args={[0.045, 0.06, 32]} />
+        <meshBasicMaterial
+          color={isSelected ? '#8ecae6' : '#b8a9c9'}
+          transparent
+          opacity={0.5}
+          side={THREE.DoubleSide}
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+        />
+      </mesh>
+
+      {/* Glowing center dot */}
+      <mesh ref={innerDotRef}>
+        <circleGeometry args={[0.02, 24]} />
+        <meshBasicMaterial
+          color={isSelected ? '#ffffff' : '#8ecae6'}
+          transparent
+          opacity={0.8}
+          side={THREE.DoubleSide}
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+        />
+      </mesh>
+    </group>
   );
 }
 
@@ -136,14 +158,12 @@ export function HumanBody() {
   // Handle Raycasting pointer move & click
   const handlePointerMove = useCallback((e: ThreeEvent<PointerEvent>) => {
     e.stopPropagation();
-    if (activeZone) return; // don't hover when zoomed into a zone
+    if (activeZone) return;
 
-    // Convert hit point to local normalized model coordinates
     const localPoint = e.point.clone();
     if (groupRef.current) {
       groupRef.current.worldToLocal(localPoint);
     }
-    // Remove scale & offset transform to get standardized height (0..1.75)
     localPoint.sub(offset).divideScalar(scale);
 
     const zone = hitToZone(localPoint, bodyType);
@@ -189,14 +209,14 @@ export function HumanBody() {
         onClick={handleClick}
       />
 
-      {/* Hover Highlight Ring */}
+      {/* Hover Highlight Indicator */}
       {hoveredZoneCenter && (
-        <HighlightRing center={hoveredZoneCenter} />
+        <HighlightIndicator center={hoveredZoneCenter} />
       )}
 
-      {/* Selected Active Highlight Ring */}
+      {/* Selected Active Highlight Indicator */}
       {activeZoneCenter && (
-        <HighlightRing center={activeZoneCenter} isSelected />
+        <HighlightIndicator center={activeZoneCenter} isSelected />
       )}
 
       {/* Hover Zone Label */}
@@ -216,7 +236,7 @@ export function HumanBody() {
           <ZoneBadge
             key={zId}
             count={count}
-            position={[center[0], center[1] + 0.08, center[2] + 0.05]}
+            position={[center[0], center[1] + 0.06, center[2] + 0.03]}
           />
         );
       })}

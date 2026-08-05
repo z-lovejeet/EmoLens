@@ -5,48 +5,42 @@ import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import gsap from 'gsap';
 import { useCheckinStore } from '@/lib/store/checkinStore';
-import { getCameraPositions } from '@/lib/three/cameraPositions';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 export function CameraController() {
   const { camera } = useThree();
   const reduced = useReducedMotion();
   const activeZone = useCheckinStore((s) => s.activeZone);
-  const bodyType = useCheckinStore((s) => s.bodyType);
   const prevZone = useRef<string | null>(null);
 
-  // Animate camera on zone selection/deselection
+  // Maintain comfortable full-body view (rotate to rear view ONLY if 'back' is selected)
   useEffect(() => {
     if (prevZone.current === activeZone) return;
     prevZone.current = activeZone;
 
-    const cameraPositions = getCameraPositions(bodyType);
-    const target = activeZone
-      ? cameraPositions[activeZone]
-      : cameraPositions.full;
-
-    if (!target) return;
-
+    const isBackView = activeZone === 'back';
     const duration = reduced ? 0.01 : 0.8;
-    const ease = reduced ? 'none' : 'power3.inOut';
+    const ease = reduced ? 'none' : 'power2.inOut';
+
+    const targetZ = isBackView ? -4.2 : 4.2;
 
     gsap.to(camera.position, {
-      x: target.position.x,
-      y: target.position.y,
-      z: target.position.z,
+      x: 0,
+      y: 0.88,
+      z: targetZ,
       duration,
       ease,
     });
 
     if (camera instanceof THREE.PerspectiveCamera) {
       gsap.to(camera, {
-        fov: target.fov,
+        fov: 40,
         duration,
         ease,
         onUpdate: () => camera.updateProjectionMatrix(),
       });
     }
-  }, [activeZone, bodyType, camera, reduced]);
+  }, [activeZone, camera, reduced]);
 
   return null;
 }

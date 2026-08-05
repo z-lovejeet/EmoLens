@@ -8,49 +8,46 @@ export interface ZoneBounds {
   center: [number, number, number];
 }
 
-// ── MALE ZONE CENTERS (Precisely aligned to 1.75 height upright male GLB) ──
+// ── MALE ZONE CENTERS (Precisely aligned to male model anatomy) ──
 export const MALE_ZONE_CENTERS: Record<ZoneId, [number, number, number]> = {
-  head: [0, 1.64, 0.02],
-  throat: [0, 1.46, 0.02],
-  shoulder_l: [-0.30, 1.34, 0.0],
-  shoulder_r: [0.30, 1.34, 0.0],
-  chest: [0, 1.20, 0.10],
-  stomach: [0, 1.02, 0.10],
+  head: [0, 1.64, 0.05],
+  throat: [0, 1.48, 0.05],
+  shoulder_l: [-0.30, 1.38, 0.02],
+  shoulder_r: [0.30, 1.38, 0.02],
+  chest: [0, 1.25, 0.10],
+  stomach: [0, 1.05, 0.09],
   back: [0, 1.15, -0.10],
-  hips: [0, 0.84, 0.06],
-  arm_l: [-0.34, 1.10, 0.0],
-  arm_r: [0.34, 1.10, 0.0],
-  hand_l: [-0.36, 0.78, 0.0],
-  hand_r: [0.36, 0.78, 0.0],
-  leg_l: [-0.15, 0.45, 0.03],
-  leg_r: [0.15, 0.45, 0.03],
-  foot_l: [-0.15, 0.07, 0.06],
-  foot_r: [0.15, 0.07, 0.06],
+  hips: [0, 0.88, 0.08],
+  arm_l: [-0.34, 1.12, 0.02],
+  arm_r: [0.34, 1.12, 0.02],
+  hand_l: [-0.36, 0.88, 0.02],
+  hand_r: [0.36, 0.88, 0.02],
+  leg_l: [-0.15, 0.46, 0.04],
+  leg_r: [0.15, 0.46, 0.04],
+  foot_l: [-0.15, 0.06, 0.10],
+  foot_r: [0.15, 0.06, 0.10],
 };
 
-// ── FEMALE ZONE CENTERS (Precisely aligned to 1.75 height upright female GLB) ──
+// ── FEMALE ZONE CENTERS (Precisely aligned to female model anatomy) ──
 export const FEMALE_ZONE_CENTERS: Record<ZoneId, [number, number, number]> = {
-  head: [0, 1.63, 0.02],
-  throat: [0, 1.45, 0.02],
-  shoulder_l: [-0.28, 1.32, 0.0],
-  shoulder_r: [0.28, 1.32, 0.0],
-  chest: [0, 1.16, 0.12],
-  stomach: [0, 0.98, 0.10],
+  head: [0, 1.63, 0.05],
+  throat: [0, 1.46, 0.05],
+  shoulder_l: [-0.26, 1.35, 0.02],
+  shoulder_r: [0.26, 1.35, 0.02],
+  chest: [0, 1.22, 0.12],
+  stomach: [0, 1.02, 0.10],
   back: [0, 1.12, -0.10],
-  hips: [0, 0.80, 0.06],
-  arm_l: [-0.32, 1.05, 0.0],
-  arm_r: [0.32, 1.05, 0.0],
-  hand_l: [-0.34, 0.74, 0.0],
-  hand_r: [0.34, 0.74, 0.0],
-  leg_l: [-0.14, 0.42, 0.03],
-  leg_r: [0.14, 0.42, 0.03],
-  foot_l: [-0.14, 0.07, 0.06],
-  foot_r: [0.14, 0.07, 0.06],
+  hips: [0, 0.84, 0.08],
+  arm_l: [-0.31, 1.08, 0.02],
+  arm_r: [0.31, 1.08, 0.02],
+  hand_l: [-0.34, 0.82, 0.02],
+  hand_r: [0.34, 0.82, 0.02],
+  leg_l: [-0.14, 0.42, 0.04],
+  leg_r: [0.14, 0.42, 0.04],
+  foot_l: [-0.14, 0.06, 0.10],
+  foot_r: [0.14, 0.06, 0.10],
 };
 
-/**
- * Returns gender-specific zone centers for label/badge/ring placement
- */
 export function getZoneCenter(zoneId: ZoneId, bodyType: BodyType | null): [number, number, number] {
   if (bodyType === 'female') {
     return FEMALE_ZONE_CENTERS[zoneId];
@@ -59,78 +56,63 @@ export function getZoneCenter(zoneId: ZoneId, bodyType: BodyType | null): [numbe
 }
 
 /**
- * Maps a 3D hit point (in normalized model space: Y 0..1.75, upright Y-up) to a specific body ZoneId
+ * Maps a 3D hit point (in normalized space 0..1.75) to exact body ZoneId
  */
 export function hitToZone(point: THREE.Vector3, bodyType: BodyType | null): ZoneId {
   const { x, y, z } = point;
   const isFemale = bodyType === 'female';
 
-  // 1. Head (Y: 1.52 -> 1.75)
-  const headMinY = isFemale ? 1.50 : 1.52;
-  if (y >= headMinY) {
+  // 1. Head (Y: 1.55 -> 1.75)
+  if (y >= 1.55) {
     return 'head';
   }
 
-  // 2. Throat / Neck (Y: 1.40 -> 1.52)
-  const throatMinY = isFemale ? 1.38 : 1.40;
-  if (y >= throatMinY && y < headMinY) {
+  // 2. Throat / Neck (Y: 1.44 -> 1.55)
+  if (y >= 1.44 && y < 1.55) {
     return 'throat';
   }
 
-  // 3. Shoulders / Upper Torso (Y: 1.28 -> 1.40)
-  const shoulderMinY = isFemale ? 1.25 : 1.28;
-  const shoulderX = isFemale ? 0.22 : 0.24;
-  if (y >= shoulderMinY && y < throatMinY) {
+  // 3. Shoulders / Upper Torso (Y: 1.33 -> 1.44)
+  const shoulderX = isFemale ? 0.20 : 0.24;
+  if (y >= 1.33 && y < 1.44) {
     if (x < -shoulderX) return 'shoulder_l';
     if (x > shoulderX) return 'shoulder_r';
     return z < -0.02 ? 'back' : 'chest';
   }
 
-  // 4. Chest / Upper Arms (Y: 1.12 -> 1.28)
-  const chestMinY = isFemale ? 1.08 : 1.12;
-  const armX = isFemale ? 0.23 : 0.25;
-  if (y >= chestMinY && y < shoulderMinY) {
+  // 4. Chest / Upper Arms (Y: 1.18 -> 1.33)
+  const armX = isFemale ? 0.22 : 0.25;
+  if (y >= 1.18 && y < 1.33) {
     if (x < -armX) return 'arm_l';
     if (x > armX) return 'arm_r';
     return z < -0.02 ? 'back' : 'chest';
   }
 
-  // 5. Stomach / Mid Back / Arms (Y: 0.92 -> 1.12)
-  const stomachMinY = isFemale ? 0.88 : 0.92;
-  if (y >= stomachMinY && y < chestMinY) {
+  // 5. Stomach / Mid Back / Arms (Y: 0.98 -> 1.18)
+  if (y >= 0.98 && y < 1.18) {
     if (x < -armX) return 'arm_l';
     if (x > armX) return 'arm_r';
     return z < -0.02 ? 'back' : 'stomach';
   }
 
-  // 6. Hips / Glutes / Hands (Y: 0.76 -> 0.92)
-  const hipsMinY = isFemale ? 0.72 : 0.76;
-  const handX = isFemale ? 0.23 : 0.25;
-  if (y >= hipsMinY && y < stomachMinY) {
+  // 6. Hips / Glutes / Hands (Y: 0.80 -> 0.98)
+  const handX = isFemale ? 0.22 : 0.25;
+  if (y >= 0.80 && y < 0.98) {
     if (x < -handX) return 'hand_l';
     if (x > handX) return 'hand_r';
     return z < -0.02 ? 'back' : 'hips';
   }
 
-  // 7. Legs (Y: 0.15 -> 0.76)
-  const legMinY = isFemale ? 0.14 : 0.15;
-  if (y >= legMinY && y < hipsMinY) {
+  // 7. Legs (Y: 0.18 -> 0.80)
+  if (y >= 0.18 && y < 0.80) {
     return x < 0 ? 'leg_l' : 'leg_r';
   }
 
-  // 8. Feet (Y: 0.00 -> 0.15)
+  // 8. Feet (Y: 0.00 -> 0.18)
   return x < 0 ? 'foot_l' : 'foot_r';
 }
 
-/**
- * Normalizes a raw loaded GLB scene:
- * - GLTFLoader automatically handles GLB scene matrix transformations.
- * - Computes clean bounding box on the upright scene.
- * - Scales model to target height (1.75 units).
- * - Shifts model origin so feet sit at Y=0, X=0, Z=0.
- */
 export function normalizeGLBScene(scene: THREE.Object3D, targetHeight = 1.75): { scale: number; offset: THREE.Vector3 } {
-  // Ensure matrices are up to date
   scene.updateMatrixWorld(true);
 
   const box = new THREE.Box3().setFromObject(scene);
