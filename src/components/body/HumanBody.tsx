@@ -35,51 +35,34 @@ function createPorcelainMaterial(): THREE.MeshPhysicalMaterial {
 }
 
 /**
- * Sleek, compact focus indicator marker for hovered or selected body zones.
+ * Refined 3D wireframe sphere indicator (compact radius 0.075) for hovered or selected body zones.
  */
-function HighlightIndicator({ center, isSelected }: { center: [number, number, number]; isSelected?: boolean }) {
-  const outerRingRef = useRef<THREE.Mesh>(null);
-  const innerDotRef = useRef<THREE.Mesh>(null);
+function HighlightSphere({ center, isSelected }: { center: [number, number, number]; isSelected?: boolean }) {
+  const meshRef = useRef<THREE.Mesh>(null);
 
   useFrame(({ clock }) => {
-    const t = clock.getElapsedTime();
-    if (outerRingRef.current) {
-      const mat = outerRingRef.current.material as THREE.MeshBasicMaterial;
-      const pulse = isSelected ? 0.7 + Math.sin(t * 5) * 0.2 : 0.4 + Math.sin(t * 3) * 0.15;
+    if (meshRef.current) {
+      const mat = meshRef.current.material as THREE.MeshBasicMaterial;
+      const t = clock.getElapsedTime();
+      const pulse = isSelected ? 0.5 + Math.sin(t * 4) * 0.15 : 0.3 + Math.sin(t * 3) * 0.1;
       mat.opacity = pulse;
-      const scalePulse = isSelected ? 1 + Math.sin(t * 4) * 0.08 : 1 + Math.sin(t * 2) * 0.05;
-      outerRingRef.current.scale.set(scalePulse, scalePulse, scalePulse);
     }
   });
 
-  return (
-    <group position={center}>
-      {/* Sleek outer ring indicator */}
-      <mesh ref={outerRingRef}>
-        <ringGeometry args={[0.045, 0.06, 32]} />
-        <meshBasicMaterial
-          color={isSelected ? '#8ecae6' : '#b8a9c9'}
-          transparent
-          opacity={0.5}
-          side={THREE.DoubleSide}
-          depthWrite={false}
-          blending={THREE.AdditiveBlending}
-        />
-      </mesh>
+  const radius = isSelected ? 0.085 : 0.07;
 
-      {/* Glowing center dot */}
-      <mesh ref={innerDotRef}>
-        <circleGeometry args={[0.02, 24]} />
-        <meshBasicMaterial
-          color={isSelected ? '#ffffff' : '#8ecae6'}
-          transparent
-          opacity={0.8}
-          side={THREE.DoubleSide}
-          depthWrite={false}
-          blending={THREE.AdditiveBlending}
-        />
-      </mesh>
-    </group>
+  return (
+    <mesh ref={meshRef} position={center}>
+      <sphereGeometry args={[radius, 24, 24]} />
+      <meshBasicMaterial
+        color={isSelected ? '#8ecae6' : '#b8a9c9'}
+        transparent
+        opacity={0.35}
+        wireframe
+        depthWrite={false}
+        blending={THREE.AdditiveBlending}
+      />
+    </mesh>
   );
 }
 
@@ -209,14 +192,14 @@ export function HumanBody() {
         onClick={handleClick}
       />
 
-      {/* Hover Highlight Indicator */}
+      {/* Hover Highlight Sphere */}
       {hoveredZoneCenter && (
-        <HighlightIndicator center={hoveredZoneCenter} />
+        <HighlightSphere center={hoveredZoneCenter} />
       )}
 
-      {/* Selected Active Highlight Indicator */}
+      {/* Selected Active Highlight Sphere */}
       {activeZoneCenter && (
-        <HighlightIndicator center={activeZoneCenter} isSelected />
+        <HighlightSphere center={activeZoneCenter} isSelected />
       )}
 
       {/* Hover Zone Label */}
