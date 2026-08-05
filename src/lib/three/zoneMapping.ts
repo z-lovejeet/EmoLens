@@ -95,17 +95,17 @@ export function hitToZone(point: THREE.Vector3, bodyType: BodyType | null): Zone
     return 'throat';
   }
 
-  // 3. Shoulders (Y: 1.32 -> 1.44)
-  const shoulderX = isFemale ? 0.18 : 0.20;
-  if (y >= 1.32 && y < 1.44) {
+  // 3. Shoulders (Y: 1.30 -> 1.46)
+  const shoulderX = isFemale ? 0.12 : 0.14;
+  if (y >= 1.30 && y < 1.46) {
     if (x > shoulderX) return 'shoulder_l';
     if (x < -shoulderX) return 'shoulder_r';
     return isRear ? 'back' : 'chest';
   }
 
-  // 4. Chest vs Back & Upper Arms (Y: 1.18 -> 1.32)
+  // 4. Chest vs Back & Upper Arms (Y: 1.18 -> 1.30)
   const armX = isFemale ? 0.18 : 0.22;
-  if (y >= 1.18 && y < 1.32) {
+  if (y >= 1.18 && y < 1.30) {
     if (x > armX) return 'arm_l';
     if (x < -armX) return 'arm_r';
     return isRear ? 'back' : 'chest';

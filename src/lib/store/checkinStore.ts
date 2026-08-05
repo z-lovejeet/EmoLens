@@ -128,7 +128,7 @@ export const ZONE_LABELS: Record<ZoneId, string> = {
   shoulder_r: 'Right Shoulder',
   chest: 'Chest',
   stomach: 'Stomach',
-  back: 'Upper Back',
+  back: 'Back',
   hips: 'Hips & Glutes',
   arm_l: 'Left Arm',
   arm_r: 'Right Arm',
