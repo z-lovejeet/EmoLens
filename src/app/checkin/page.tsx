@@ -1,19 +1,25 @@
 'use client';
 
 import { BodyScene } from '@/components/body/BodyScene';
+import { GenderSelect } from '@/components/checkin/GenderSelect';
 import { useCheckinStore, ZONE_LABELS } from '@/lib/store/checkinStore';
 import { Button } from '@/components/ui/Button';
 import { ArrowLeft } from 'lucide-react';
 import styles from './page.module.css';
 
 export default function CheckinPage() {
-  const { activeZone, isZoomed, deselectZone, zoneData } = useCheckinStore();
+  const { gender, activeZone, isZoomed, deselectZone, zoneData } = useCheckinStore();
 
   // Count total sensations across all zones
   const totalSensations = Object.values(zoneData).reduce(
     (acc, zone) => acc + zone.sensations.length,
     0
   );
+
+  // Show gender selector if no gender chosen yet
+  if (!gender) {
+    return <GenderSelect />;
+  }
 
   return (
     <main className={styles.main}>
