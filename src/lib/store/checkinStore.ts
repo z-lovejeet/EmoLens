@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type Gender = 'male' | 'female';
+export type BodyType = 'male' | 'female' | 'neutral';
 
 export type ZoneId =
   | 'head' | 'throat' | 'chest' | 'stomach' | 'back'
@@ -19,10 +19,7 @@ export interface ZoneData {
 }
 
 interface CheckinState {
-  // Gender selection
-  gender: Gender | null;
-  setGender: (g: Gender) => void;
-
+  bodyType: BodyType | null;
   activeZone: ZoneId | null;
   hoveredZone: ZoneId | null;
   isZoomed: boolean;
@@ -40,6 +37,7 @@ interface CheckinState {
   setProcessing: (processing: boolean) => void;
   getZoneSensationCount: (zone: ZoneId) => number;
   getAverageIntensity: (zone: ZoneId) => number;
+  setBodyType: (type: BodyType) => void;
   reset: () => void;
 }
 
@@ -58,9 +56,7 @@ const createEmptyZoneData = (): Record<ZoneId, ZoneData> => {
 };
 
 export const useCheckinStore = create<CheckinState>((set, get) => ({
-  gender: null,
-  setGender: (g) => set({ gender: g }),
-
+  bodyType: null,
   activeZone: null,
   hoveredZone: null,
   isZoomed: false,
@@ -68,6 +64,7 @@ export const useCheckinStore = create<CheckinState>((set, get) => ({
   isProcessing: false,
   context: '',
 
+  setBodyType: (type) => set({ bodyType: type }),
   selectZone: (zone) => set({ activeZone: zone, isZoomed: true }),
   deselectZone: () => set({ activeZone: null, isZoomed: false }),
   setHoveredZone: (zone) => set({ hoveredZone: zone }),
@@ -114,7 +111,7 @@ export const useCheckinStore = create<CheckinState>((set, get) => ({
 
   reset: () =>
     set({
-      gender: null,
+      bodyType: null,
       activeZone: null,
       hoveredZone: null,
       isZoomed: false,

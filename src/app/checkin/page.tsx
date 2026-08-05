@@ -3,12 +3,14 @@
 import { BodyScene } from '@/components/body/BodyScene';
 import { GenderSelect } from '@/components/checkin/GenderSelect';
 import { useCheckinStore, ZONE_LABELS } from '@/lib/store/checkinStore';
+import type { BodyType } from '@/lib/store/checkinStore';
 import { Button } from '@/components/ui/Button';
 import { ArrowLeft } from 'lucide-react';
 import styles from './page.module.css';
 
 export default function CheckinPage() {
-  const { gender, activeZone, isZoomed, deselectZone, zoneData } = useCheckinStore();
+  const { activeZone, isZoomed, deselectZone, zoneData, bodyType, setBodyType } =
+    useCheckinStore();
 
   // Count total sensations across all zones
   const totalSensations = Object.values(zoneData).reduce(
@@ -16,13 +18,13 @@ export default function CheckinPage() {
     0
   );
 
-  // Show gender selector if no gender chosen yet
-  if (!gender) {
-    return <GenderSelect />;
-  }
-
   return (
     <main className={styles.main}>
+      {/* Gender selection modal — shows before body */}
+      {!bodyType && (
+        <GenderSelect onSelect={(type: BodyType) => setBodyType(type)} />
+      )}
+
       <div className={styles.sceneWrapper}>
         <BodyScene />
 
@@ -45,8 +47,8 @@ export default function CheckinPage() {
           </div>
         )}
 
-        {/* Instructions when not zoomed */}
-        {!isZoomed && (
+        {/* Instructions when not zoomed (only after gender selected) */}
+        {!isZoomed && bodyType && (
           <div className={styles.instructions}>
             <p>Tap a body zone to begin</p>
             {totalSensations > 0 && (

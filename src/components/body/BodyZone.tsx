@@ -14,9 +14,10 @@ interface BodyZoneProps {
   geometry: THREE.BufferGeometry;
   position?: [number, number, number];
   center: [number, number, number];
+  invisible?: boolean;
 }
 
-export function BodyZone({ zoneId, geometry, position, center }: BodyZoneProps) {
+export function BodyZone({ zoneId, geometry, position, center, invisible }: BodyZoneProps) {
   const meshRef = useRef<THREE.Mesh>(null);
   const materialRef = useRef<THREE.ShaderMaterial>(null);
   const wireframeRef = useRef<THREE.MeshBasicMaterial>(null);
@@ -45,35 +46,36 @@ export function BodyZone({ zoneId, geometry, position, center }: BodyZoneProps) 
 
   // Update shader uniforms every frame
   useFrame(({ clock }) => {
-    if (!materialRef.current) return;
-    const u = materialRef.current.uniforms;
+    if (!invisible && materialRef.current) {
+      const u = materialRef.current.uniforms;
 
-    u.uTime.value = clock.getElapsedTime();
+      u.uTime.value = clock.getElapsedTime();
 
-    // Smooth lerp hover state
-    const targetHovered = (isHovered && !isAnyZoneActive) ? 1.0 : 0.0;
-    u.uHovered.value += (targetHovered - u.uHovered.value) * 0.1;
+      // Smooth lerp hover state
+      const targetHovered = (isHovered && !isAnyZoneActive) ? 1.0 : 0.0;
+      u.uHovered.value += (targetHovered - u.uHovered.value) * 0.1;
 
-    // Smooth lerp selected state
-    const targetSelected = isActive ? 1.0 : 0.0;
-    u.uSelected.value += (targetSelected - u.uSelected.value) * 0.1;
+      // Smooth lerp selected state
+      const targetSelected = isActive ? 1.0 : 0.0;
+      u.uSelected.value += (targetSelected - u.uSelected.value) * 0.1;
 
-    // Smooth lerp completed state
-    const targetCompleted = isCompleted ? 1.0 : 0.0;
-    u.uCompleted.value += (targetCompleted - u.uCompleted.value) * 0.08;
+      // Smooth lerp completed state
+      const targetCompleted = isCompleted ? 1.0 : 0.0;
+      u.uCompleted.value += (targetCompleted - u.uCompleted.value) * 0.08;
 
-    // Update intensity color for completed zones
-    if (isCompleted && avgIntensity > 0) {
-      const color = INTENSITY_COLORS[avgIntensity] || INTENSITY_COLORS[1];
-      (u.uIntensityColor.value as THREE.Color).lerp(color, 0.08);
+      // Update intensity color for completed zones
+      if (isCompleted && avgIntensity > 0) {
+        const color = INTENSITY_COLORS[avgIntensity] || INTENSITY_COLORS[1];
+        (u.uIntensityColor.value as THREE.Color).lerp(color, 0.08);
+      }
+
+      // Dim non-active zones when a zone is selected
+      const targetOpacity = (isAnyZoneActive && !isActive) ? 0.2 : 0.92;
+      u.uOpacity.value += (targetOpacity - u.uOpacity.value) * 0.08;
     }
 
-    // Dim non-active zones when a zone is selected
-    const targetOpacity = (isAnyZoneActive && !isActive) ? 0.2 : 0.92;
-    u.uOpacity.value += (targetOpacity - u.uOpacity.value) * 0.08;
-
     // Wireframe opacity — brighter on hover
-    if (wireframeRef.current) {
+    if (!invisible && wireframeRef.current) {
       const targetWire = (isHovered && !isAnyZoneActive) ? 0.18 : 0.035;
       wireframeRef.current.opacity += (targetWire - wireframeRef.current.opacity) * 0.1;
     }
@@ -102,7 +104,7 @@ export function BodyZone({ zoneId, geometry, position, center }: BodyZoneProps) 
 
   return (
     <group position={position}>
-      {/* Primary body mesh — custom SSS + Fresnel shader */}
+      {/* Primary body mesh */}
       <mesh
         ref={meshRef}
         geometry={geometry}
@@ -110,29 +112,35 @@ export function BodyZone({ zoneId, geometry, position, center }: BodyZoneProps) 
         onPointerOver={handlePointerOver}
         onPointerOut={handlePointerOut}
       >
-        <shaderMaterial
-          ref={materialRef}
-          uniforms={uniforms}
-          vertexShader={bodyVertexShader}
-          fragmentShader={bodyFragmentShader}
-          transparent
-          depthWrite
-          side={THREE.FrontSide}
-        />
+        {invisible ? (
+          <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+        ) : (
+          <shaderMaterial
+            ref={materialRef}
+            uniforms={uniforms}
+            vertexShader={bodyVertexShader}
+            fragmentShader={bodyFragmentShader}
+            transparent
+            depthWrite
+            side={THREE.FrontSide}
+          />
+        )}
       </mesh>
 
       {/* Wireframe holographic overlay */}
-      <mesh geometry={geometry} scale={[1.003, 1.003, 1.003]}>
-        <meshBasicMaterial
-          ref={wireframeRef}
-          color="#8ecae6"
-          wireframe
-          transparent
-          opacity={0.035}
-          depthWrite={false}
-          blending={THREE.AdditiveBlending}
-        />
-      </mesh>
+      {!invisible && (
+        <mesh geometry={geometry} scale={[1.003, 1.003, 1.003]}>
+          <meshBasicMaterial
+            ref={wireframeRef}
+            color="#8ecae6"
+            wireframe
+            transparent
+            opacity={0.035}
+            depthWrite={false}
+            blending={THREE.AdditiveBlending}
+          />
+        </mesh>
+      )}
 
       {/* Sensation count badge */}
       {sensationCount > 0 && !isActive && (
