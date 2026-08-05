@@ -9,20 +9,44 @@ import { createBodyGeometries } from '@/lib/three/bodyGeometry';
 import { BodyZone } from './BodyZone';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useCheckinStore } from '@/lib/store/checkinStore';
-import { bodyVertexShader, bodyFragmentShader, createBodyUniforms } from '@/lib/three/bodyShader';
 
 const MODEL_PATH = '/models/human-body.glb';
+
+/**
+ * Premium material for the real human body GLB.
+ * Uses MeshPhysicalMaterial (works with SkinnedMesh + bones).
+ * Gives a smooth, semi-translucent porcelain/mannequin look.
+ */
+function createBodyMaterial(): THREE.MeshPhysicalMaterial {
+  return new THREE.MeshPhysicalMaterial({
+    color: new THREE.Color('#c8beb5'),
+    roughness: 0.55,
+    metalness: 0.02,
+    clearcoat: 0.3,
+    clearcoatRoughness: 0.4,
+    sheen: 1.0,
+    sheenRoughness: 0.6,
+    sheenColor: new THREE.Color('#8ecae6'),
+    emissive: new THREE.Color('#1a2a3a'),
+    emissiveIntensity: 0.15,
+    envMapIntensity: 0.8,
+    transparent: true,
+    opacity: 0.95,
+    side: THREE.DoubleSide,
+  });
+}
 
 function GLTFBodyModel() {
   const { scene } = useGLTF(MODEL_PATH);
   const bodyType = useCheckinStore((s) => s.bodyType);
+  const groupRef = useRef<THREE.Group>(null);
 
-  // Clone scene and configure visibility based on bodyType
+  // Clone scene once per bodyType change
   const preparedScene = useMemo(() => {
     const cloned = scene.clone(true);
 
     cloned.traverse((child) => {
-      // Hide/show armatures based on body type
+      // Toggle armature visibility based on body type
       if (child.name === 'Armature_60') {
         child.visible = bodyType === 'male' || bodyType === 'neutral';
       }
@@ -30,20 +54,15 @@ function GLTFBodyModel() {
         child.visible = bodyType === 'female';
       }
 
-      // Apply custom shader to all meshes
-      if (child instanceof THREE.Mesh && child.visible) {
-        const shaderMat = new THREE.ShaderMaterial({
-          uniforms: createBodyUniforms(),
-          vertexShader: bodyVertexShader,
-          fragmentShader: bodyFragmentShader,
-          transparent: true,
-          depthWrite: true,
-          side: THREE.DoubleSide,
-        });
-        child.material = shaderMat;
+      // Apply premium material to ALL mesh types (Mesh + SkinnedMesh)
+      if ((child as THREE.Mesh).isMesh) {
+        const mesh = child as THREE.Mesh;
+        mesh.material = createBodyMaterial();
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
 
-        if (!child.geometry.attributes.normal) {
-          child.geometry.computeVertexNormals();
+        if (!mesh.geometry.attributes.normal) {
+          mesh.geometry.computeVertexNormals();
         }
       }
     });
@@ -51,19 +70,8 @@ function GLTFBodyModel() {
     return cloned;
   }, [scene, bodyType]);
 
-  // Animate shader time
-  useFrame(({ clock }) => {
-    const t = clock.getElapsedTime();
-    preparedScene.traverse((child) => {
-      if (child instanceof THREE.Mesh && child.material instanceof THREE.ShaderMaterial) {
-        child.material.uniforms.uTime.value = t;
-      }
-    });
-  });
-
-  // Auto-center and scale
-  const { scale, offset } = useMemo(() => {
-    // Get bounds of the VISIBLE armature only
+  // Auto-center and scale to fit our scene
+  const { modelScale, offset } = useMemo(() => {
     const targetArmature = bodyType === 'female' ? 'Armature.001_121' : 'Armature_60';
     let targetNode: THREE.Object3D | null = null;
     preparedScene.traverse((child) => {
@@ -81,15 +89,29 @@ function GLTFBodyModel() {
     const s = size.y > 0 ? targetHeight / size.y : 1;
 
     return {
-      scale: s,
+      modelScale: s,
       offset: new THREE.Vector3(-center.x * s, -box.min.y * s, -center.z * s),
     };
   }, [preparedScene, bodyType]);
 
+  // Gentle breathing emissive pulse
+  useFrame(({ clock }) => {
+    const t = clock.getElapsedTime();
+    const pulse = 0.1 + Math.sin(t * 0.8) * 0.05;
+    preparedScene.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh) {
+        const mat = (child as THREE.Mesh).material as THREE.MeshPhysicalMaterial;
+        if (mat.emissiveIntensity !== undefined) {
+          mat.emissiveIntensity = pulse;
+        }
+      }
+    });
+  });
+
   return (
     <primitive
       object={preparedScene}
-      scale={[scale, scale, scale]}
+      scale={[modelScale, modelScale, modelScale]}
       position={[offset.x, offset.y, offset.z]}
     />
   );
@@ -104,9 +126,33 @@ export function BodyModel() {
   // Don't render anything if no body type selected
   if (!bodyType) return null;
 
+  // Entrance animation
+  useEffect(() => {
+    if (!groupRef.current || reduced) return;
+    groupRef.current.scale.set(0.95, 0.95, 0.95);
+    gsap.to(groupRef.current.scale, {
+      x: 1, y: 1, z: 1,
+      duration: 0.8,
+      ease: 'power3.out',
+    });
+  }, [reduced, bodyType]);
+
+  // Idle float
+  useEffect(() => {
+    if (!groupRef.current || reduced) return;
+    const tween = gsap.to(groupRef.current.position, {
+      y: '+=0.03',
+      duration: 4.0,
+      ease: 'sine.inOut',
+      yoyo: true,
+      repeat: -1,
+    });
+    return () => { tween.kill(); };
+  }, [reduced, bodyType]);
+
   return (
     <group ref={groupRef}>
-      {/* Real 3D GLB body — visual only, not interactive */}
+      {/* Real 3D GLB body — visual display */}
       <GLTFBodyModel />
 
       {/* Invisible interactive zone hitboxes */}
