@@ -5,12 +5,19 @@ import * as THREE from 'three';
 import gsap from 'gsap';
 import { createBodyGeometries } from '@/lib/three/bodyGeometry';
 import { BodyZone } from './BodyZone';
+import { useCheckinStore } from '@/lib/store/checkinStore';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 export function BodyModel() {
   const groupRef = useRef<THREE.Group>(null);
   const reduced = useReducedMotion();
-  const zones = useMemo(() => createBodyGeometries(), []);
+  const gender = useCheckinStore((s) => s.gender);
+
+  // Recreate geometry when gender changes
+  const zones = useMemo(
+    () => createBodyGeometries(gender ?? 'male'),
+    [gender]
+  );
 
   // Entrance animation
   useEffect(() => {
@@ -26,7 +33,7 @@ export function BodyModel() {
       duration: 1.0,
       ease: 'power3.out',
     });
-  }, [reduced]);
+  }, [reduced, gender]);
 
   // Idle float — gentle breathing motion
   useEffect(() => {
