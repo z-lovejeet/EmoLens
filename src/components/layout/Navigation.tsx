@@ -70,36 +70,37 @@ export function Navigation() {
           })}
         </div>
 
-        {/* Auth button */}
-        <AuthButton />
+        {/* Right side controls (Theme Toggle + Auth Button on far right) */}
+        <div className={styles.rightControls}>
+          <motion.button
+            className={styles.themeToggle}
+            onClick={handleToggleTheme}
+            whileTap={{ scale: 0.85 }}
+            aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+          >
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={theme}
+                initial={{ rotate: -180, opacity: 0 }}
+                animate={{ rotate: 0, opacity: 1 }}
+                exit={{ rotate: 180, opacity: 0 }}
+                transition={{
+                  type: 'spring',
+                  stiffness: 200,
+                  damping: 15,
+                }}
+              >
+                {theme === 'dark' ? (
+                  <Moon size={20} strokeWidth={1.75} />
+                ) : (
+                  <Sun size={20} strokeWidth={1.75} />
+                )}
+              </motion.div>
+            </AnimatePresence>
+          </motion.button>
 
-        {/* Theme toggle */}
-        <motion.button
-          className={styles.themeToggle}
-          onClick={handleToggleTheme}
-          whileTap={{ scale: 0.85 }}
-          aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-        >
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={theme}
-              initial={{ rotate: -180, opacity: 0 }}
-              animate={{ rotate: 0, opacity: 1 }}
-              exit={{ rotate: 180, opacity: 0 }}
-              transition={{
-                type: 'spring',
-                stiffness: 200,
-                damping: 15,
-              }}
-            >
-              {theme === 'dark' ? (
-                <Moon size={20} strokeWidth={1.75} />
-              ) : (
-                <Sun size={20} strokeWidth={1.75} />
-              )}
-            </motion.div>
-          </AnimatePresence>
-        </motion.button>
+          <AuthButton />
+        </div>
       </div>
     </nav>
   );

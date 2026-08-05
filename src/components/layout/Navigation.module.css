@@ -64,6 +64,13 @@
   border-radius: var(--radius-full);
 }
 
+.rightControls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-left: auto;
+}
+
 .themeToggle {
   display: flex;
   align-items: center;
