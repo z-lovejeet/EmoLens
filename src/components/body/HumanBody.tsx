@@ -7,7 +7,7 @@ import { useGLTF } from '@react-three/drei';
 import { useFrame, type ThreeEvent } from '@react-three/fiber';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useCheckinStore, type ZoneId, ZONE_LABELS } from '@/lib/store/checkinStore';
-import { hitToZone, normalizeGLBScene, getZoneCenter } from '@/lib/three/zoneMapping';
+import { hitToZone, normalizeGLBScene, getZoneCenter, ZONE_SPHERE_RADIUS } from '@/lib/three/zoneMapping';
 import { ZoneLabel } from './ZoneLabel';
 import { ZoneBadge } from './ZoneBadge';
 
@@ -35,21 +35,30 @@ function createPorcelainMaterial(): THREE.MeshPhysicalMaterial {
 }
 
 /**
- * Refined 3D wireframe sphere indicator (compact radius 0.075) for hovered or selected body zones.
+ * Sleek 3D wireframe sphere indicator dynamically sized according to body part / muscle group area.
  */
-function HighlightSphere({ center, isSelected }: { center: [number, number, number]; isSelected?: boolean }) {
+function HighlightSphere({
+  zoneId,
+  center,
+  isSelected,
+}: {
+  zoneId: ZoneId;
+  center: [number, number, number];
+  isSelected?: boolean;
+}) {
   const meshRef = useRef<THREE.Mesh>(null);
 
   useFrame(({ clock }) => {
     if (meshRef.current) {
       const mat = meshRef.current.material as THREE.MeshBasicMaterial;
       const t = clock.getElapsedTime();
-      const pulse = isSelected ? 0.5 + Math.sin(t * 4) * 0.15 : 0.3 + Math.sin(t * 3) * 0.1;
+      const pulse = isSelected ? 0.55 + Math.sin(t * 4) * 0.15 : 0.35 + Math.sin(t * 3) * 0.1;
       mat.opacity = pulse;
     }
   });
 
-  const radius = isSelected ? 0.085 : 0.07;
+  const baseRadius = ZONE_SPHERE_RADIUS[zoneId] || 0.10;
+  const radius = isSelected ? baseRadius * 1.15 : baseRadius;
 
   return (
     <mesh ref={meshRef} position={center}>
@@ -177,12 +186,22 @@ export function HumanBody() {
 
   if (!bodyType) return null;
 
-  const activeZoneCenter = activeZone ? getZoneCenter(activeZone, bodyType) : null;
-  const hoveredZoneCenter = hoveredZone && !activeZone ? getZoneCenter(hoveredZone, bodyType) : null;
+  // Transform normalized center (0..1.75) to local model space (scaled & offset)
+  const getModelSpaceCenter = (zId: ZoneId): [number, number, number] => {
+    const raw = getZoneCenter(zId, bodyType);
+    return [
+      raw[0] * scale + offset.x,
+      raw[1] * scale + offset.y,
+      raw[2] * scale + offset.z,
+    ];
+  };
+
+  const activeZoneCenter = activeZone ? getModelSpaceCenter(activeZone) : null;
+  const hoveredZoneCenter = hoveredZone && !activeZone ? getModelSpaceCenter(hoveredZone) : null;
 
   return (
     <group ref={groupRef}>
-      {/* 3D Anatomy Model Mesh with Raycasting Listeners */}
+      {/* 3D Anatomy Model Mesh */}
       <primitive
         object={preparedScene}
         scale={[scale, scale, scale]}
@@ -193,20 +212,20 @@ export function HumanBody() {
       />
 
       {/* Hover Highlight Sphere */}
-      {hoveredZoneCenter && (
-        <HighlightSphere center={hoveredZoneCenter} />
+      {hoveredZone && hoveredZoneCenter && (
+        <HighlightSphere zoneId={hoveredZone} center={hoveredZoneCenter} />
       )}
 
       {/* Selected Active Highlight Sphere */}
-      {activeZoneCenter && (
-        <HighlightSphere center={activeZoneCenter} isSelected />
+      {activeZone && activeZoneCenter && (
+        <HighlightSphere zoneId={activeZone} center={activeZoneCenter} isSelected />
       )}
 
       {/* Hover Zone Label */}
-      {hoveredZone && !activeZone && (
+      {hoveredZone && !activeZone && hoveredZoneCenter && (
         <ZoneLabel
           label={ZONE_LABELS[hoveredZone]}
-          position={getZoneCenter(hoveredZone, bodyType)}
+          position={hoveredZoneCenter}
         />
       )}
 
@@ -214,12 +233,12 @@ export function HumanBody() {
       {Object.entries(zoneData).map(([zId, data]) => {
         const count = data.sensations.length;
         if (count === 0 || activeZone === zId) return null;
-        const center = getZoneCenter(zId as ZoneId, bodyType);
+        const center = getModelSpaceCenter(zId as ZoneId);
         return (
           <ZoneBadge
             key={zId}
             count={count}
-            position={[center[0], center[1] + 0.06, center[2] + 0.03]}
+            position={[center[0], center[1] + 0.08, center[2] + 0.04]}
           />
         );
       })}
