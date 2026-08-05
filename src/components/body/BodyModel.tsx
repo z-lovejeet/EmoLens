@@ -13,7 +13,7 @@ export function BodyModel() {
 
   const zones = useMemo(() => createBodyGeometries(), []);
 
-  // Model entrance animation
+  // Model entrance animation — scale only (no opacity fade which breaks with demand rendering)
   useEffect(() => {
     if (!groupRef.current) return;
     const group = groupRef.current;
@@ -23,33 +23,16 @@ export function BodyModel() {
       return;
     }
 
-    group.scale.set(0.97, 0.97, 0.97);
+    group.scale.set(0.95, 0.95, 0.95);
 
     gsap.to(group.scale, {
       x: 1, y: 1, z: 1,
       duration: 0.8,
       ease: 'power3.out',
     });
-
-    // Fade in materials
-    group.traverse((child) => {
-      if ((child as THREE.Mesh).material) {
-        const mat = (child as THREE.Mesh).material as THREE.MeshStandardMaterial;
-        if (mat.isMeshStandardMaterial) {
-          mat.transparent = true;
-          mat.opacity = 0;
-          gsap.to(mat, {
-            opacity: 1,
-            duration: 0.5,
-            ease: 'power2.out',
-            onComplete: () => { mat.transparent = false; },
-          });
-        }
-      }
-    });
   }, [reduced]);
 
-  // Idle float animation
+  // Idle float animation — gentle breathing motion
   useEffect(() => {
     if (!groupRef.current || reduced) return;
 
