@@ -6,7 +6,7 @@ import { Environment, OrbitControls } from '@react-three/drei';
 import { EffectComposer, Bloom, Vignette, ChromaticAberration } from '@react-three/postprocessing';
 import { BlendFunction } from 'postprocessing';
 import * as THREE from 'three';
-import { BodyModel } from './BodyModel';
+import { HumanBody } from './HumanBody';
 import { CameraController } from './CameraController';
 import { BodyParticles, GroundGlow } from './BodyParticles';
 import { useCheckinStore } from '@/lib/store/checkinStore';
@@ -90,7 +90,7 @@ function SceneContent() {
 
       {/* Body model */}
       <Suspense fallback={<SceneLoading />}>
-        <BodyModel />
+        <HumanBody />
       </Suspense>
 
       {/* ── Post-Processing Stack ── */}
