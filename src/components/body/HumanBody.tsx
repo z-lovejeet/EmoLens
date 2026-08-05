@@ -61,13 +61,14 @@ function HighlightSphere({
   const radius = isSelected ? baseRadius * 1.15 : baseRadius;
 
   return (
-    <mesh ref={meshRef} position={center}>
+    <mesh ref={meshRef} position={center} renderOrder={10}>
       <sphereGeometry args={[radius, 24, 24]} />
       <meshBasicMaterial
         color={isSelected ? '#8ecae6' : '#b8a9c9'}
         transparent
         opacity={0.35}
         wireframe
+        depthTest={false}
         depthWrite={false}
         blending={THREE.AdditiveBlending}
       />
@@ -77,10 +78,12 @@ function HighlightSphere({
 
 export function HumanBody() {
   const groupRef = useRef<THREE.Group>(null);
+  const lastHitIsRear = useRef<boolean>(false);
   const reduced = useReducedMotion();
 
   const bodyType = useCheckinStore((s) => s.bodyType);
   const activeZone = useCheckinStore((s) => s.activeZone);
+  const activeZoneIsRear = useCheckinStore((s) => s.activeZoneIsRear);
   const hoveredZone = useCheckinStore((s) => s.hoveredZone);
   const zoneData = useCheckinStore((s) => s.zoneData);
   const selectZone = useCheckinStore((s) => s.selectZone);
@@ -147,15 +150,26 @@ export function HumanBody() {
     });
   });
 
+  // Precise front vs rear surface normal classification
+  const getIsRearHit = useCallback((e: ThreeEvent<PointerEvent | MouseEvent>): boolean => {
+    if (e.face) {
+      const worldNormal = e.face.normal.clone().transformDirection(e.object.matrixWorld);
+      return worldNormal.z < 0;
+    }
+    return e.point.z < -0.05;
+  }, []);
+
   // Handle Raycasting pointer move & click using direct world hit coordinates
   const handlePointerMove = useCallback((e: ThreeEvent<PointerEvent>) => {
     e.stopPropagation();
     if (activeZone) return;
 
+    const isRear = getIsRearHit(e);
+    lastHitIsRear.current = isRear;
     const zone = hitToZone(e.point, bodyType);
     setHoveredZone(zone);
     document.body.style.cursor = 'pointer';
-  }, [activeZone, bodyType, setHoveredZone]);
+  }, [activeZone, bodyType, getIsRearHit, setHoveredZone]);
 
   const handlePointerOut = useCallback(() => {
     if (!activeZone) {
@@ -168,14 +182,16 @@ export function HumanBody() {
     e.stopPropagation();
     if (activeZone) return;
 
+    const isRear = getIsRearHit(e);
+    lastHitIsRear.current = isRear;
     const zone = hitToZone(e.point, bodyType);
-    selectZone(zone);
-  }, [activeZone, bodyType, selectZone]);
+    selectZone(zone, isRear);
+  }, [activeZone, bodyType, getIsRearHit, selectZone]);
 
   if (!bodyType) return null;
 
-  const activeZoneCenter = activeZone ? getZoneCenter(activeZone, bodyType) : null;
-  const hoveredZoneCenter = hoveredZone && !activeZone ? getZoneCenter(hoveredZone, bodyType) : null;
+  const activeZoneCenter = activeZone ? getZoneCenter(activeZone, bodyType, activeZoneIsRear) : null;
+  const hoveredZoneCenter = hoveredZone && !activeZone ? getZoneCenter(hoveredZone, bodyType, lastHitIsRear.current) : null;
 
   return (
     <group ref={groupRef}>
