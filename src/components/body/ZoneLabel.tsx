@@ -14,14 +14,16 @@ export function ZoneLabel({ label, position }: ZoneLabelProps) {
     <Html
       position={position}
       center
-      style={{ pointerEvents: 'none', userSelect: 'none' }}
+      distanceFactor={6}
+      sprite
+      style={{ pointerEvents: 'none' }}
     >
       <motion.div
         className={styles.label}
-        initial={{ opacity: 0, scale: 0.9, y: 4 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.9 }}
-        transition={{ duration: 0.18, ease: [0.33, 1, 0.68, 1] }}
+        initial={{ opacity: 0, y: 5 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2, ease: [0.33, 1, 0.68, 1] }}
       >
         {label}
       </motion.div>

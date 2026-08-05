@@ -89,8 +89,8 @@ export function HumanBody() {
   const modelPath = MODEL_PATHS[bodyType || 'male'];
   const { scene } = useGLTF(modelPath);
 
-  // Clone scene and apply material + normalization
-  const { preparedScene, scale, offset } = useMemo(() => {
+  // Clone scene and apply material + standardized normalization directly on transform
+  const preparedScene = useMemo(() => {
     const cloned = scene.clone(true);
     const material = createPorcelainMaterial();
 
@@ -106,8 +106,8 @@ export function HumanBody() {
       }
     });
 
-    const { scale, offset } = normalizeGLBScene(cloned, 1.75);
-    return { preparedScene: cloned, scale, offset };
+    normalizeGLBScene(cloned, 1.75);
+    return cloned;
   }, [scene]);
 
   // Entrance & float animations
@@ -147,21 +147,15 @@ export function HumanBody() {
     });
   });
 
-  // Handle Raycasting pointer move & click
+  // Handle Raycasting pointer move & click using direct world hit coordinates
   const handlePointerMove = useCallback((e: ThreeEvent<PointerEvent>) => {
     e.stopPropagation();
     if (activeZone) return;
 
-    const localPoint = e.point.clone();
-    if (groupRef.current) {
-      groupRef.current.worldToLocal(localPoint);
-    }
-    localPoint.sub(offset).divideScalar(scale);
-
-    const zone = hitToZone(localPoint, bodyType);
+    const zone = hitToZone(e.point, bodyType);
     setHoveredZone(zone);
     document.body.style.cursor = 'pointer';
-  }, [activeZone, bodyType, scale, offset, setHoveredZone]);
+  }, [activeZone, bodyType, setHoveredZone]);
 
   const handlePointerOut = useCallback(() => {
     if (!activeZone) {
@@ -174,62 +168,40 @@ export function HumanBody() {
     e.stopPropagation();
     if (activeZone) return;
 
-    const localPoint = e.point.clone();
-    if (groupRef.current) {
-      groupRef.current.worldToLocal(localPoint);
-    }
-    localPoint.sub(offset).divideScalar(scale);
-
-    const zone = hitToZone(localPoint, bodyType);
+    const zone = hitToZone(e.point, bodyType);
     selectZone(zone);
-  }, [activeZone, bodyType, scale, offset, selectZone]);
+  }, [activeZone, bodyType, selectZone]);
 
   if (!bodyType) return null;
 
-  // Transform normalized center (0..1.75) to local model space (scaled & offset)
-  const getModelSpaceCenter = (zId: ZoneId): [number, number, number] => {
-    const raw = getZoneCenter(zId, bodyType);
-    return [
-      raw[0] * scale + offset.x,
-      raw[1] * scale + offset.y,
-      raw[2] * scale + offset.z,
-    ];
-  };
-
-  const activeZoneCenter = activeZone ? getModelSpaceCenter(activeZone) : null;
-  const hoveredZoneCenter = hoveredZone && !activeZone ? getModelSpaceCenter(hoveredZone) : null;
+  const activeZoneCenter = activeZone ? getZoneCenter(activeZone, bodyType) : null;
+  const hoveredZoneCenter = hoveredZone && !activeZone ? getZoneCenter(hoveredZone, bodyType) : null;
 
   return (
     <group ref={groupRef}>
-      {/* 3D Anatomy Model Mesh */}
+      {/* 3D Anatomy Model Mesh with Raycasting Listeners */}
       <primitive
         object={preparedScene}
-        scale={[scale, scale, scale]}
-        position={[offset.x, offset.y, offset.z]}
         onPointerMove={handlePointerMove}
         onPointerOut={handlePointerOut}
         onClick={handleClick}
       />
 
-      {/* Hover Highlight Sphere */}
+      {/* Hover Highlight Sphere Circle */}
       {hoveredZone && hoveredZoneCenter && (
         <HighlightSphere zoneId={hoveredZone} center={hoveredZoneCenter} />
       )}
 
-      {/* Selected Active Highlight Sphere */}
+      {/* Selected Active Highlight Sphere Circle */}
       {activeZone && activeZoneCenter && (
         <HighlightSphere zoneId={activeZone} center={activeZoneCenter} isSelected />
       )}
 
-      {/* Hover Zone Label — dynamically floated right above the sphere */}
+      {/* Hover Zone Label */}
       {hoveredZone && !activeZone && hoveredZoneCenter && (
         <ZoneLabel
           label={ZONE_LABELS[hoveredZone]}
-          position={[
-            hoveredZoneCenter[0],
-            hoveredZoneCenter[1] + (ZONE_SPHERE_RADIUS[hoveredZone] || 0.10) + 0.05,
-            hoveredZoneCenter[2],
-          ]}
+          position={hoveredZoneCenter}
         />
       )}
 
@@ -237,7 +209,7 @@ export function HumanBody() {
       {Object.entries(zoneData).map(([zId, data]) => {
         const count = data.sensations.length;
         if (count === 0 || activeZone === zId) return null;
-        const center = getModelSpaceCenter(zId as ZoneId);
+        const center = getZoneCenter(zId as ZoneId, bodyType);
         return (
           <ZoneBadge
             key={zId}

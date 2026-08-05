@@ -28,14 +28,14 @@ export const ZONE_SPHERE_RADIUS: Record<ZoneId, number> = {
   foot_r: 0.065,
 };
 
-// ── MALE ZONE CENTERS (Viewer Facing Front: Model Right is -X, Model Left is +X) ──
+// ── MALE ZONE CENTERS (Standardized World Space: Feet Y=0, Head Y=1.75) ──
 export const MALE_ZONE_CENTERS: Record<ZoneId, [number, number, number]> = {
   head: [0, 1.643, 0.02],
   throat: [0, 1.494, 0.02],
   shoulder_l: [0.260, 1.380, 0.0],
   shoulder_r: [-0.260, 1.380, 0.0],
-  chest: [0, 1.300, 0.08],
-  stomach: [0, 1.096, 0.05],
+  chest: [0, 1.280, 0.08],
+  stomach: [0, 1.080, 0.05],
   back: [0, 1.235, -0.08],
   hips: [0, 0.894, -0.08],
   arm_l: [0.280, 1.120, 0.0],
@@ -48,16 +48,16 @@ export const MALE_ZONE_CENTERS: Record<ZoneId, [number, number, number]> = {
   foot_r: [-0.100, 0.080, 0.06],
 };
 
-// ── FEMALE ZONE CENTERS (Measured directly from female mesh geometry) ──
+// ── FEMALE ZONE CENTERS (Standardized World Space: Feet Y=0, Head Y=1.75) ──
 export const FEMALE_ZONE_CENTERS: Record<ZoneId, [number, number, number]> = {
   head: [0, 1.620, 0.04],
   throat: [0, 1.499, 0.00],
-  shoulder_l: [0.210, 1.340, 0.0],   // Model's Left Shoulder (Viewer Right: +X)
-  shoulder_r: [-0.210, 1.340, 0.0],  // Model's Right Shoulder (Viewer Left: -X)
-  chest: [0, 1.280, 0.08],           // Centered over bust line
-  stomach: [0, 1.083, 0.04],         // Centered over abdominal waist line
+  shoulder_l: [0.210, 1.340, 0.0],
+  shoulder_r: [-0.210, 1.340, 0.0],
+  chest: [0, 1.280, 0.08],
+  stomach: [0, 1.083, 0.04],
   back: [0, 1.280, -0.06],
-  hips: [0, 0.895, -0.06],          // Gluteal curve Z < -0.02
+  hips: [0, 0.895, -0.06],
   arm_l: [0.252, 1.102, -0.02],
   arm_r: [-0.252, 1.100, -0.02],
   hand_l: [0.326, 0.872, -0.02],
@@ -76,7 +76,7 @@ export function getZoneCenter(zoneId: ZoneId, bodyType: BodyType | null): [numbe
 }
 
 /**
- * Maps a 3D hit point in normalized model coordinates (Y 0..1.75) to body ZoneId.
+ * Maps a world raycast hit point (Y 0..1.75) to exact body ZoneId.
  * - Front View (Z >= -0.02): Torso maps exclusively to Chest (Y >= 1.20) or Stomach (Y < 1.20).
  * - Rear View (Z < -0.02): Torso maps exclusively to Back (Y >= 0.98) or Hips & Glutes (Y < 0.98).
  */
@@ -96,7 +96,7 @@ export function hitToZone(point: THREE.Vector3, bodyType: BodyType | null): Zone
   }
 
   // 3. Shoulders (Y: 1.32 -> 1.44)
-  const shoulderX = isFemale ? 0.16 : 0.20;
+  const shoulderX = isFemale ? 0.18 : 0.20;
   if (y >= 1.32 && y < 1.44) {
     if (x > shoulderX) return 'shoulder_l';
     if (x < -shoulderX) return 'shoulder_r';
@@ -135,7 +135,13 @@ export function hitToZone(point: THREE.Vector3, bodyType: BodyType | null): Zone
   return x >= 0 ? 'foot_l' : 'foot_r';
 }
 
-export function normalizeGLBScene(scene: THREE.Object3D, targetHeight = 1.75): { scale: number; offset: THREE.Vector3 } {
+/**
+ * Standardizes raw GLB models directly into world coordinates:
+ * - Feet sit at Y=0.00
+ * - Head sits at Y=1.75
+ * - Centered at X=0.00, Z=0.00
+ */
+export function normalizeGLBScene(scene: THREE.Object3D, targetHeight = 1.75) {
   scene.updateMatrixWorld(true);
 
   const box = new THREE.Box3().setFromObject(scene);
@@ -145,7 +151,8 @@ export function normalizeGLBScene(scene: THREE.Object3D, targetHeight = 1.75): {
   box.getCenter(center);
 
   const scale = size.y > 0 ? targetHeight / size.y : 1;
-  const offset = new THREE.Vector3(-center.x * scale, -box.min.y * scale, -center.z * scale);
 
-  return { scale, offset };
+  scene.scale.set(scale, scale, scale);
+  scene.position.set(-center.x * scale, -box.min.y * scale, -center.z * scale);
+  scene.updateMatrixWorld(true);
 }
