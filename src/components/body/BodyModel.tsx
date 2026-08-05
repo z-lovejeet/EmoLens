@@ -39,51 +39,57 @@ function createBodyMaterial(): THREE.MeshPhysicalMaterial {
 function GLTFBodyModel() {
   const { scene } = useGLTF(MODEL_PATH);
   const bodyType = useCheckinStore((s) => s.bodyType);
-  const groupRef = useRef<THREE.Group>(null);
+  const materialsApplied = useRef(false);
 
-  // Clone scene once per bodyType change
-  const preparedScene = useMemo(() => {
-    const cloned = scene.clone(true);
+  // Apply premium material to all meshes ONCE
+  useEffect(() => {
+    if (materialsApplied.current) return;
+    scene.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh) {
+        const mesh = child as THREE.Mesh;
+        mesh.material = createBodyMaterial();
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        if (!mesh.geometry.attributes.normal) {
+          mesh.geometry.computeVertexNormals();
+        }
+      }
+    });
+    materialsApplied.current = true;
+  }, [scene]);
 
-    cloned.traverse((child) => {
-      // Toggle armature visibility based on body type
+  // Toggle armature visibility when bodyType changes
+  useEffect(() => {
+    scene.traverse((child) => {
       if (child.name === 'Armature_60') {
         child.visible = bodyType === 'male' || bodyType === 'neutral';
       }
       if (child.name === 'Armature.001_121') {
         child.visible = bodyType === 'female';
       }
-
-      // Apply premium material to ALL mesh types (Mesh + SkinnedMesh)
-      if ((child as THREE.Mesh).isMesh) {
-        const mesh = child as THREE.Mesh;
-        mesh.material = createBodyMaterial();
-        mesh.castShadow = true;
-        mesh.receiveShadow = true;
-
-        if (!mesh.geometry.attributes.normal) {
-          mesh.geometry.computeVertexNormals();
-        }
-      }
     });
-
-    return cloned;
   }, [scene, bodyType]);
 
-  // Auto-center and scale to fit our scene
+  // Auto-center and scale the visible body
   const { modelScale, offset } = useMemo(() => {
     const targetArmature = bodyType === 'female' ? 'Armature.001_121' : 'Armature_60';
     let targetNode: THREE.Object3D | null = null;
-    preparedScene.traverse((child) => {
+    scene.traverse((child) => {
       if (child.name === targetArmature) targetNode = child;
     });
 
-    const measureTarget = targetNode || preparedScene;
+    // Temporarily make target visible for measurement
+    const measureTarget = targetNode || scene;
+    const wasVisible = measureTarget.visible;
+    measureTarget.visible = true;
+
     const box = new THREE.Box3().setFromObject(measureTarget);
     const size = new THREE.Vector3();
     const center = new THREE.Vector3();
     box.getSize(size);
     box.getCenter(center);
+
+    measureTarget.visible = wasVisible;
 
     const targetHeight = 1.75;
     const s = size.y > 0 ? targetHeight / size.y : 1;
@@ -92,14 +98,14 @@ function GLTFBodyModel() {
       modelScale: s,
       offset: new THREE.Vector3(-center.x * s, -box.min.y * s, -center.z * s),
     };
-  }, [preparedScene, bodyType]);
+  }, [scene, bodyType]);
 
   // Gentle breathing emissive pulse
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime();
     const pulse = 0.1 + Math.sin(t * 0.8) * 0.05;
-    preparedScene.traverse((child) => {
-      if ((child as THREE.Mesh).isMesh) {
+    scene.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh && child.visible) {
         const mat = (child as THREE.Mesh).material as THREE.MeshPhysicalMaterial;
         if (mat.emissiveIntensity !== undefined) {
           mat.emissiveIntensity = pulse;
@@ -110,7 +116,7 @@ function GLTFBodyModel() {
 
   return (
     <primitive
-      object={preparedScene}
+      object={scene}
       scale={[modelScale, modelScale, modelScale]}
       position={[offset.x, offset.y, offset.z]}
     />
