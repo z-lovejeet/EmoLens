@@ -1,7 +1,12 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
+import { AnimatePresence } from 'framer-motion';
 import { BodyScene } from '@/components/body/BodyScene';
 import { GenderSelect } from '@/components/checkin/GenderSelect';
+import { SensationPanel } from '@/components/checkin/SensationPanel';
+import { ContextInput } from '@/components/checkin/ContextInput';
+import { CheckInButton } from '@/components/checkin/CheckInButton';
 import { useCheckinStore, ZONE_LABELS } from '@/lib/store/checkinStore';
 import type { BodyType } from '@/lib/store/checkinStore';
 import { Button } from '@/components/ui/Button';
@@ -9,26 +14,84 @@ import { ArrowLeft } from 'lucide-react';
 import styles from './page.module.css';
 
 export default function CheckinPage() {
-  const { activeZone, isZoomed, deselectZone, zoneData, bodyType, setBodyType } =
-    useCheckinStore();
+  const router = useRouter();
+  const {
+    activeZone,
+    isZoomed,
+    deselectZone,
+    zoneData,
+    bodyType,
+    setBodyType,
+    setProcessing,
+    setCheckinResult,
+    setCrisisResult,
+  } = useCheckinStore();
 
-  // Count total sensations across all zones
   const totalSensations = Object.values(zoneData).reduce(
     (acc, zone) => acc + zone.sensations.length,
     0
   );
 
+  const handleCheckIn = async () => {
+    setProcessing(true);
+    try {
+      // Prepare body data for API
+      const bodyData = Object.entries(zoneData)
+        .filter(([, data]) => data.sensations.length > 0)
+        .map(([zone, data]) => ({
+          zone,
+          sensations: data.sensations,
+        }));
+
+      const response = await fetch('/api/checkin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          bodyData,
+          context: useCheckinStore.getState().context || undefined,
+        }),
+      });
+
+      if (!response.ok) throw new Error('Check-in failed');
+
+      const data = await response.json();
+
+      // Check for crisis response
+      if (data.crisis) {
+        setCrisisResult(data.validationMessage);
+      } else {
+        setCheckinResult({
+          suggestions: data.suggestions,
+          validation: data.validation,
+          threadId: data.threadId,
+        });
+      }
+
+      setProcessing(false);
+      router.push('/results');
+    } catch (error) {
+      console.error('Check-in error:', error);
+      setProcessing(false);
+    }
+  };
+
   return (
     <main className={styles.main}>
-      {/* Gender selection modal — shows before body */}
       {!bodyType && (
         <GenderSelect onSelect={(type: BodyType) => setBodyType(type)} />
       )}
 
-      <div className={styles.sceneWrapper}>
+      <div
+        className={[
+          styles.sceneWrapper,
+          isZoomed ? styles.panelOpen : '',
+        ]
+          .filter(Boolean)
+          .join(' ')}
+      >
         <BodyScene />
 
-        {/* Back button when zoomed */}
+        {/* Zone header overlay when zoomed */}
         {isZoomed && activeZone && (
           <div className={styles.overlay}>
             <Button
@@ -47,18 +110,28 @@ export default function CheckinPage() {
           </div>
         )}
 
-        {/* Instructions when not zoomed (only after gender selected) */}
-        {!isZoomed && bodyType && (
+        {/* Instructions when not zoomed */}
+        {!isZoomed && bodyType && totalSensations === 0 && (
           <div className={styles.instructions}>
             <p>Tap a body zone to begin</p>
-            {totalSensations > 0 && (
-              <p className={styles.sensationCount}>
-                {totalSensations} sensation{totalSensations !== 1 ? 's' : ''} mapped
-              </p>
-            )}
           </div>
         )}
       </div>
+
+      {/* Sensation panel (drawer on mobile, side panel on desktop) */}
+      <AnimatePresence>
+        {isZoomed && activeZone && <SensationPanel />}
+      </AnimatePresence>
+
+      {/* Context input — shown when user has mapped sensations and is not zoomed */}
+      {!isZoomed && bodyType && totalSensations > 0 && (
+        <div className={styles.contextArea}>
+          <ContextInput />
+        </div>
+      )}
+
+      {/* Floating check-in button */}
+      <CheckInButton onSubmit={handleCheckIn} />
     </main>
   );
 }
