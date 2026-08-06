@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import type { EmotionSuggestion, CopingStrategy, CardData } from '@/lib/ai/state';
 
 export type BodyType = 'male' | 'female';
 
@@ -34,6 +35,35 @@ interface CheckinState {
   zoneData: Record<ZoneId, ZoneData>;
   isProcessing: boolean;
   context: string;
+
+  // Results state
+  threadId: string | null;
+  suggestions: EmotionSuggestion[];
+  validationMessage: string | null;
+  selectedEmotion: string | null;
+  copingStrategies: CopingStrategy[];
+  communicationCard: CardData | null;
+  remapCount: number;
+  isCrisis: boolean;
+  crisisMessage: string | null;
+
+  // Results actions
+  setCheckinResult: (result: {
+    suggestions: EmotionSuggestion[];
+    validation: string;
+    threadId: string;
+  }) => void;
+  setCrisisResult: (message: string) => void;
+  setSelectedEmotion: (emotion: string) => void;
+  setSelectionResult: (result: {
+    copingStrategies: CopingStrategy[];
+    communicationCard: CardData;
+  }) => void;
+  setRemapResult: (result: {
+    suggestions: EmotionSuggestion[];
+    validation: string;
+  }) => void;
+  incrementRemapCount: () => void;
 
   selectZone: (zone: ZoneId, isRear?: boolean) => void;
   deselectZone: () => void;
@@ -76,6 +106,15 @@ export const useCheckinStore = create<CheckinState>((set, get) => ({
   zoneData: createEmptyZoneData(),
   isProcessing: false,
   context: '',
+  threadId: null,
+  suggestions: [],
+  validationMessage: null,
+  selectedEmotion: null,
+  copingStrategies: [],
+  communicationCard: null,
+  remapCount: 0,
+  isCrisis: false,
+  crisisMessage: null,
 
   setBodyType: (type) => set({ bodyType: type }),
   selectZone: (zone, isRear = false) => set({ activeZone: zone, activeZoneIsRear: isRear, isZoomed: true }),
@@ -113,6 +152,34 @@ export const useCheckinStore = create<CheckinState>((set, get) => ({
   setContext: (context) => set({ context }),
   setProcessing: (processing) => set({ isProcessing: processing }),
 
+  setCheckinResult: (result) => set({
+    suggestions: result.suggestions,
+    validationMessage: result.validation,
+    threadId: result.threadId,
+    isCrisis: false,
+    crisisMessage: null,
+  }),
+
+  setCrisisResult: (message) => set({
+    isCrisis: true,
+    crisisMessage: message,
+    suggestions: [],
+  }),
+
+  setSelectedEmotion: (emotion) => set({ selectedEmotion: emotion }),
+
+  setSelectionResult: (result) => set({
+    copingStrategies: result.copingStrategies,
+    communicationCard: result.communicationCard,
+  }),
+
+  setRemapResult: (result) => set({
+    suggestions: result.suggestions,
+    validationMessage: result.validation,
+  }),
+
+  incrementRemapCount: () => set((state) => ({ remapCount: state.remapCount + 1 })),
+
   getZoneSensationCount: (zone) => get().zoneData[zone].sensations.length,
 
   getAverageIntensity: (zone) => {
@@ -132,6 +199,15 @@ export const useCheckinStore = create<CheckinState>((set, get) => ({
       zoneData: createEmptyZoneData(),
       isProcessing: false,
       context: '',
+      threadId: null,
+      suggestions: [],
+      validationMessage: null,
+      selectedEmotion: null,
+      copingStrategies: [],
+      communicationCard: null,
+      remapCount: 0,
+      isCrisis: false,
+      crisisMessage: null,
     }),
 }));
 
