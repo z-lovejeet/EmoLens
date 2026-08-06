@@ -1,39 +1,59 @@
 .chip {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-1-5, 6px);
+  gap: var(--space-1-5);
   font-size: var(--text-sm);
   font-weight: 500;
-  padding: var(--space-2) var(--space-3);
+  padding: var(--space-2) 14px;
   border-radius: var(--radius-full);
-  border: 1px solid var(--border-default);
-  background-color: var(--surface-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   color: var(--text-secondary);
   cursor: pointer;
-  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.33, 1, 0.68, 1);
   outline: none;
+  user-select: none;
+}
+
+[data-theme="light"] .chip {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(0, 0, 0, 0.04);
 }
 
 .chip:hover {
-  background-color: var(--interactive-secondary-hover);
-  border-color: var(--border-strong);
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.22);
   color: var(--text-primary);
+  transform: translateY(-1px);
+}
+
+[data-theme="light"] .chip:hover {
+  background: rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 0, 0, 0.15);
 }
 
 .chip:focus-visible {
-  box-shadow: 0 0 0 2px var(--bg-primary), 0 0 0 4px var(--border-focus);
+  box-shadow: 0 0 0 2px var(--surface-base), 0 0 0 4px var(--border-focus);
 }
 
 .chip.selected {
-  background-color: var(--interactive-primary);
-  border-color: var(--interactive-primary);
-  color: var(--text-inverse, white);
-  box-shadow: var(--shadow-xs);
+  background: linear-gradient(135deg, var(--color-teal-400), var(--color-teal-600));
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow:
+    0 4px 14px rgba(95, 180, 217, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .chip.selected:hover {
-  background-color: var(--interactive-primary-hover);
-  border-color: var(--interactive-primary-hover);
+  background: linear-gradient(135deg, var(--color-teal-300), var(--color-teal-500));
+  box-shadow:
+    0 6px 18px rgba(95, 180, 217, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
 }
 
 .icon {

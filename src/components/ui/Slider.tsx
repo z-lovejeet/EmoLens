@@ -17,34 +17,57 @@ interface SliderProps {
 }
 
 export function Slider({ value, onChange, className }: SliderProps) {
-  const current = INTENSITY_LABELS[value - 1];
+  // Map continuous value (1.0 to 5.0) to closest label (0 to 4)
+  const closestIndex = Math.min(
+    4,
+    Math.max(0, Math.round(value) - 1)
+  );
+  const current = INTENSITY_LABELS[closestIndex];
 
   return (
     <div className={[styles.wrapper, className || ''].filter(Boolean).join(' ')}>
-      <input
-        type="range"
-        min={1}
-        max={5}
-        step={1}
-        value={value}
-        onChange={(e) => onChange(Number(e.target.value))}
-        className={styles.slider}
-        aria-label="Sensation intensity"
-        aria-valuetext={current.label}
-        aria-valuemin={1}
-        aria-valuemax={5}
-      />
+      <div className={styles.trackWrapper}>
+        <input
+          type="range"
+          min={1}
+          max={5}
+          step={0.01}
+          value={value}
+          onChange={(e) => onChange(parseFloat(e.target.value))}
+          className={styles.slider}
+          style={{ '--thumb-color': current.color } as React.CSSProperties}
+          aria-label="Sensation intensity"
+          aria-valuetext={`${current.label} (${value.toFixed(1)})`}
+          aria-valuemin={1}
+          aria-valuemax={5}
+        />
+        <div className={styles.ticks} aria-hidden="true">
+          {[1, 2, 3, 4, 5].map((step) => (
+            <span
+              key={step}
+              className={[
+                styles.tick,
+                Math.round(value) === step ? styles.tickActive : '',
+              ].filter(Boolean).join(' ')}
+            />
+          ))}
+        </div>
+      </div>
+
       <div className={styles.labels}>
         <span className={styles.labelMin}>Barely there</span>
         <span className={styles.labelMax}>Overwhelming</span>
       </div>
+
       <div className={styles.current}>
         <span
           className={styles.dot}
-          style={{ backgroundColor: current.color }}
+          style={{ backgroundColor: current.color, boxShadow: `0 0 10px ${current.color}` }}
           aria-hidden="true"
         />
-        <span className={styles.currentLabel}>{current.label}</span>
+        <span className={styles.currentLabel} style={{ color: current.color }}>
+          {current.label}
+        </span>
       </div>
     </div>
   );

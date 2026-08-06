@@ -5,82 +5,128 @@
   width: 100%;
 }
 
+.trackWrapper {
+  position: relative;
+  width: 100%;
+  height: 28px;
+  display: flex;
+  align-items: center;
+}
+
 .slider {
   appearance: none;
+  -webkit-appearance: none;
   width: 100%;
-  height: 6px;
+  height: 8px;
   background: linear-gradient(
-    to right,
-    var(--color-intensity-1),
-    var(--color-intensity-2),
-    var(--color-intensity-3),
-    var(--color-intensity-4),
-    var(--color-intensity-5)
+    90deg,
+    var(--color-intensity-1) 0%,
+    var(--color-intensity-2) 25%,
+    var(--color-intensity-3) 50%,
+    var(--color-intensity-4) 75%,
+    var(--color-intensity-5) 100%
   );
   border-radius: var(--radius-full);
   outline: none;
-  transition: opacity 0.2s;
   cursor: pointer;
+  z-index: 2;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4), 0 0 8px rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
+/* ── Webkit Slider Thumb ── */
 .slider::-webkit-slider-thumb {
   appearance: none;
+  -webkit-appearance: none;
   width: 22px;
   height: 22px;
-  background: var(--color-background);
-  border: 1px solid var(--color-border-strong);
   border-radius: 50%;
+  background: #ffffff;
+  border: 3.5px solid var(--thumb-color, #3a99c2);
+  box-shadow:
+    0 0 12px var(--thumb-color, #3a99c2),
+    0 2px 6px rgba(0, 0, 0, 0.6);
   cursor: pointer;
-  box-shadow: var(--shadow-sm);
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s ease;
 }
 
+/* ── Firefox Slider Thumb ── */
 .slider::-moz-range-thumb {
   width: 22px;
   height: 22px;
-  background: var(--color-background);
-  border: 1px solid var(--color-border-strong);
   border-radius: 50%;
+  background: #ffffff;
+  border: 3.5px solid var(--thumb-color, #3a99c2);
+  box-shadow:
+    0 0 12px var(--thumb-color, #3a99c2),
+    0 2px 6px rgba(0, 0, 0, 0.6);
   cursor: pointer;
-  box-shadow: var(--shadow-sm);
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s ease;
 }
 
+/* Hover & Active States */
 .slider:hover::-webkit-slider-thumb {
-  box-shadow: var(--shadow-md);
-  transform: scale(1.1);
+  transform: scale(1.2);
+  box-shadow:
+    0 0 16px var(--thumb-color, #3a99c2),
+    0 4px 10px rgba(0, 0, 0, 0.7);
 }
 
 .slider:hover::-moz-range-thumb {
-  box-shadow: var(--shadow-md);
-  transform: scale(1.1);
+  transform: scale(1.2);
+  box-shadow:
+    0 0 16px var(--thumb-color, #3a99c2),
+    0 4px 10px rgba(0, 0, 0, 0.7);
 }
 
 .slider:active::-webkit-slider-thumb {
-  transform: scale(1.15);
-  box-shadow: var(--shadow-md);
+  transform: scale(1.3);
+  box-shadow:
+    0 0 20px var(--thumb-color, #3a99c2),
+    0 6px 14px rgba(0, 0, 0, 0.8);
 }
 
 .slider:active::-moz-range-thumb {
-  transform: scale(1.15);
-  box-shadow: var(--shadow-md);
+  transform: scale(1.3);
+  box-shadow:
+    0 0 20px var(--thumb-color, #3a99c2),
+    0 6px 14px rgba(0, 0, 0, 0.8);
 }
 
-.slider:focus-visible::-webkit-slider-thumb {
-  outline: 2px solid var(--color-teal);
-  outline-offset: 2px;
+/* Step Ticks overlay */
+.ticks {
+  position: absolute;
+  top: 50%;
+  left: 11px;
+  right: 11px;
+  transform: translateY(-50%);
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+  z-index: 1;
 }
 
-.slider:focus-visible::-moz-range-thumb {
-  outline: 2px solid var(--color-teal);
-  outline-offset: 2px;
+.tick {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.tickActive {
+  background: #ffffff;
+  transform: scale(1.4);
+  box-shadow: 0 0 6px #ffffff;
 }
 
 .labels {
   display: flex;
   justify-content: space-between;
-  color: var(--color-text-muted);
-  font-size: var(--font-size-sm);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  letter-spacing: 0.02em;
 }
 
 .current {
@@ -88,16 +134,19 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  margin-top: var(--space-2);
+  margin-top: var(--space-1);
 }
 
 .dot {
-  width: 12px;
-  height: 12px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .currentLabel {
-  font-weight: var(--font-weight-medium);
-  color: var(--color-text);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  transition: color 0.2s ease;
 }
