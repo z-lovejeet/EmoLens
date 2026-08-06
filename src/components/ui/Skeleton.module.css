@@ -1,9 +1,9 @@
 .skeleton {
   background: linear-gradient(
     90deg,
-    var(--color-surface-secondary) 0%,
-    var(--color-surface-tertiary) 50%,
-    var(--color-surface-secondary) 100%
+    var(--surface-secondary) 0%,
+    var(--surface-tertiary) 50%,
+    var(--surface-secondary) 100%
   );
   background-size: 200% 100%;
   animation: skeleton-shimmer 1.5s ease-in-out infinite;
@@ -14,8 +14,8 @@
   flex-direction: column;
   gap: var(--space-3);
   padding: var(--space-4);
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
+  background-color: var(--surface-primary);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
 }
 
@@ -31,6 +31,6 @@
 @media (prefers-reduced-motion: reduce) {
   .skeleton {
     animation: none;
-    background: var(--color-surface-tertiary);
+    background: var(--surface-tertiary);
   }
 }
