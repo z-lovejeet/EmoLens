@@ -38,7 +38,9 @@ export interface BodyZoneData {
 export interface EmotionSuggestion {
   emotion: string;
   confidence: number;
+  category?: string;
   explanation: string;
+  possibleCauses?: string[];
   bodyConnection: string;
 }
 
