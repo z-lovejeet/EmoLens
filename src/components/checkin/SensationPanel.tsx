@@ -204,6 +204,11 @@ export function SensationPanel() {
         initial="hidden"
         animate="visible"
         exit="exit"
+        role="region"
+        aria-label={`Sensation selection panel for ${ZONE_LABELS[zone]}`}
+        onKeyDown={(e: React.KeyboardEvent) => {
+          if (e.key === 'Escape') deselectZone();
+        }}
       >
         {/* Mobile drag handle */}
         <div className={styles.dragHandle}>
@@ -230,8 +235,8 @@ export function SensationPanel() {
         {/* Scrollable content */}
         <div className={styles.content}>
           {/* Sensation chips */}
-          <div>
-            <p className={styles.sectionTitle}>Sensations</p>
+          <fieldset className={styles.chipFieldset}>
+            <legend className={styles.sectionTitle}>Select sensations for {ZONE_LABELS[zone]}</legend>
             <motion.div
               className={styles.chipGrid}
               variants={chipContainerVariants}
@@ -326,7 +331,7 @@ export function SensationPanel() {
                 </AnimatePresence>
               </motion.div>
             </motion.div>
-          </div>
+          </fieldset>
 
           {/* Selected sensations with intensity sliders */}
           <div>
