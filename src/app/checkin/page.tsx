@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AnimatePresence } from 'framer-motion';
 import { BodyScene } from '@/components/body/BodyScene';
@@ -9,7 +10,9 @@ import { ContextInput } from '@/components/checkin/ContextInput';
 import { CheckInButton } from '@/components/checkin/CheckInButton';
 import { useCheckinStore, ZONE_LABELS } from '@/lib/store/checkinStore';
 import type { BodyType } from '@/lib/store/checkinStore';
+import { getDictionaryLocal } from '@/lib/db/local/operations';
 import { Button } from '@/components/ui/Button';
+import { ErrorState } from '@/components/ui/ErrorState';
 import { ArrowLeft } from 'lucide-react';
 import styles from './page.module.css';
 
@@ -27,6 +30,8 @@ export default function CheckinPage() {
     setCrisisResult,
   } = useCheckinStore();
 
+  const [checkinError, setCheckinError] = useState<string | null>(null);
+
   const totalSensations = Object.values(zoneData).reduce(
     (acc, zone) => acc + zone.sensations.length,
     0
@@ -34,6 +39,7 @@ export default function CheckinPage() {
 
   const handleCheckIn = async () => {
     setProcessing(true);
+    setCheckinError(null);
     try {
       // Prepare body data for API
       const bodyData = Object.entries(zoneData)
@@ -43,12 +49,23 @@ export default function CheckinPage() {
           sensations: data.sensations,
         }));
 
+      // Fetch user dictionary context from IndexedDB
+      const rawDict = await getDictionaryLocal();
+      const dictionary = rawDict.map((d) => ({
+        emotion: d.emotion,
+        bodyPatterns: d.body_patterns,
+        frequency: d.frequency,
+        effectiveCoping: d.effective_coping,
+        ineffectiveCoping: d.ineffective_coping,
+      }));
+
       const response = await fetch('/api/checkin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           bodyData,
           context: useCheckinStore.getState().context || undefined,
+          dictionary,
         }),
       });
 
@@ -71,6 +88,7 @@ export default function CheckinPage() {
       router.push('/results');
     } catch (error) {
       console.error('Check-in error:', error);
+      setCheckinError('We couldn\u2019t process your check-in. Please check your connection and try again.');
       setProcessing(false);
     }
   };
@@ -110,6 +128,21 @@ export default function CheckinPage() {
           </div>
         )}
 
+        {/* Change model button when not zoomed */}
+        {!isZoomed && bodyType && (
+          <div className={styles.topActions}>
+            <Button
+              variant="ghost"
+              size="sm"
+              icon={<ArrowLeft size={18} />}
+              onClick={() => setBodyType(null)}
+              className={styles.changeModelBtn}
+            >
+              Change Model
+            </Button>
+          </div>
+        )}
+
         {/* Instructions when not zoomed */}
         {!isZoomed && bodyType && totalSensations === 0 && (
           <div className={styles.instructions}>
@@ -127,6 +160,15 @@ export default function CheckinPage() {
       {!isZoomed && bodyType && totalSensations > 0 && (
         <div className={styles.contextArea}>
           <ContextInput />
+        </div>
+      )}
+      {/* Error state */}
+      {checkinError && (
+        <div className={styles.contextArea}>
+          <ErrorState
+            message={checkinError}
+            onRetry={handleCheckIn}
+          />
         </div>
       )}
 

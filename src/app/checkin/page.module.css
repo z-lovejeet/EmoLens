@@ -1,6 +1,6 @@
 .main {
   width: 100%;
-  height: calc(100vh - 64px);
+  height: 100vh;
   display: flex;
   flex-direction: column;
   padding: 0;
@@ -10,7 +10,7 @@
 
 @media (min-width: 1024px) {
   .main {
-    height: calc(100vh - 56px);
+    height: 100vh;
     padding-top: 56px; /* account for top nav */
   }
 }
@@ -54,6 +54,22 @@
 }
 
 .backBtn {
+  background: rgba(20, 20, 26, 0.8) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: var(--radius-md) !important;
+}
+
+.topActions {
+  position: absolute;
+  top: var(--space-4);
+  left: var(--space-4);
+  z-index: var(--z-dropdown);
+  pointer-events: auto;
+}
+
+.changeModelBtn {
   background: rgba(20, 20, 26, 0.8) !important;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
