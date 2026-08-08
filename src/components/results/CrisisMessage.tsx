@@ -1,7 +1,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Phone, MessageCircle } from 'lucide-react';
+import { Phone, MessageCircle, HeartHandshake } from 'lucide-react';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 import styles from './CrisisMessage.module.css';
 
 interface Props {
@@ -9,15 +10,19 @@ interface Props {
 }
 
 export function CrisisMessage({ message }: Props) {
+  const reducedMotion = useReducedMotion();
+
   return (
     <motion.div
       className={styles.container}
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: reducedMotion ? 0 : 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: [0.33, 1, 0.68, 1] }}
+      transition={{ duration: reducedMotion ? 0.01 : 0.6, ease: [0.33, 1, 0.68, 1] }}
+      role="alert"
+      aria-live="assertive"
     >
       <div className={styles.header}>
-        <span className={styles.icon}>🫂</span>
+        <HeartHandshake size={28} className={styles.icon} strokeWidth={1.5} />
         <h2 className={styles.title}>You deserve support right now</h2>
       </div>
 

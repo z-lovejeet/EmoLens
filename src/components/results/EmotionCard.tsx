@@ -75,6 +75,8 @@ export function EmotionCard({
       style={{ '--accent': accentColor } as React.CSSProperties}
       whileHover={!isSelected && !isDeselected ? { translateY: -2 } : undefined}
       type="button"
+      role="radio"
+      aria-checked={isSelected}
     >
       {/* Left accent bar */}
       <div className={styles.accentBar} />
