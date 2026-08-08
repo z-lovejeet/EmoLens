@@ -85,12 +85,6 @@
   letter-spacing: 0.02em;
 }
 
-[data-theme="light"] .badge {
-  background: rgba(42, 122, 158, 0.1);
-  color: var(--color-teal-700);
-  border-color: rgba(42, 122, 158, 0.25);
-}
-
 .arrowIcon {
   width: 32px;
   height: 32px;
