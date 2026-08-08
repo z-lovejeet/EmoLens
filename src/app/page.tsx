@@ -75,7 +75,7 @@ export default function LandingPage() {
           transition={getTransition(0.35, 0.8)}
         >
           Your body speaks before you do. EmoLens gently translates physical
-          sensations into emotional vocabulary — giving neurodivergent youth the
+          sensations into emotional vocabulary giving neurodivergent youth the
           words to express what they already feel.
         </motion.p>
 
