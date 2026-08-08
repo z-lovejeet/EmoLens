@@ -56,6 +56,8 @@ export function EmotionCardList({
           variants={containerVariants}
           initial="hidden"
           animate="visible"
+          role="radiogroup"
+          aria-label="Emotion suggestions — select the emotion that best matches how you feel"
         >
           {suggestions.map((suggestion) => (
             <EmotionCard
