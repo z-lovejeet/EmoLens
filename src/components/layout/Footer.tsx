@@ -50,12 +50,12 @@ export function Footer() {
             <h3 className={styles.heading}>Resources</h3>
             <ul className={styles.list}>
               <li>
-                <a href="tel:988" className={styles.link}>
+                <a href="https://988lifeline.org" target="_blank" rel="noopener noreferrer" className={styles.link}>
                   988 Suicide &amp; Crisis Lifeline
                 </a>
               </li>
               <li>
-                <a href="sms:741741?body=HELLO" className={styles.link}>
+                <a href="https://www.crisistextline.org" target="_blank" rel="noopener noreferrer" className={styles.link}>
                   Crisis Text Line
                 </a>
               </li>
