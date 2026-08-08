@@ -33,9 +33,10 @@ export function Navigation() {
   return (
     <nav className={styles.nav}>
       <div className={styles.inner}>
-        {/* Logo - desktop only */}
+        {/* Logo */}
         <Link href="/" className={styles.logo}>
-          EmoLens
+          <img src="/logo.jpg" alt="EmoLens Logo" className={styles.logoImg} />
+          <span className={styles.logoText}>EmoLens</span>
         </Link>
 
         {/* Nav links */}
