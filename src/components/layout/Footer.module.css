@@ -1,0 +1,140 @@
+.footer {
+  background: var(--surface-primary);
+  border-top: 1px solid var(--border-subtle);
+  padding: var(--space-8) var(--space-4) var(--space-6);
+  width: 100%;
+  margin-top: auto;
+}
+
+.inner {
+  max-width: var(--max-width-wide);
+  margin: 0 auto;
+}
+
+.grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.logoImg {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+}
+
+.logoText {
+  font-family: var(--font-outfit), sans-serif;
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, #ffffff 0%, #8ecae6 65%, #b8a9c9 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.tagline {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: var(--text-md);
+  margin: 0;
+}
+
+.description {
+  color: var(--text-tertiary);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  margin: 0;
+  max-width: 300px;
+}
+
+.heading {
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider);
+  font-weight: 600;
+  margin: 0;
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.link {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: var(--text-sm);
+  transition: color 0.2s ease;
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+}
+
+.link:hover {
+  color: var(--text-accent);
+}
+
+.hr {
+  border: none;
+  border-top: 1px solid var(--border-subtle);
+  margin: var(--space-8) 0 var(--space-6);
+}
+
+.bottom {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.builtWith {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  color: var(--text-tertiary);
+  font-size: var(--text-sm);
+  margin: 0;
+}
+
+.heart {
+  color: var(--color-red-500);
+}
+
+@media (min-width: 1024px) {
+  .footer {
+    padding: var(--space-12) var(--space-6) var(--space-8);
+  }
+
+  .grid {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .column {
+    flex: 1;
+  }
+
+  .column:first-child {
+    flex: 2;
+  }
+}
