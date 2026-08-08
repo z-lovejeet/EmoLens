@@ -6,6 +6,7 @@ import { BookOpen } from 'lucide-react';
 import { useDictionaryStore } from '@/lib/store/dictionaryStore';
 import { DictionaryEntry } from '@/components/dictionary/DictionaryEntry';
 import { EmptyState } from '@/components/dictionary/EmptyState';
+import { SkeletonCard } from '@/components/ui/Skeleton';
 import styles from './page.module.css';
 
 const containerVariants = {
@@ -63,9 +64,10 @@ export default function DictionaryPage() {
 
       {/* Loading */}
       {isLoading && (
-        <div className={styles.loading}>
-          <div className={styles.loadingPulse} />
-          <p className={styles.loadingText}>Loading your dictionary...</p>
+        <div className={styles.grid}>
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
         </div>
       )}
 
