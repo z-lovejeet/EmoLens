@@ -43,6 +43,7 @@ interface CheckinState {
   selectedEmotion: string | null;
   copingStrategies: CopingStrategy[];
   communicationCard: CardData | null;
+  dictionaryUpdate: any | null;
   remapCount: number;
   isCrisis: boolean;
   crisisMessage: string | null;
@@ -60,6 +61,7 @@ interface CheckinState {
   setSelectionResult: (result: {
     copingStrategies: CopingStrategy[];
     communicationCard: CardData;
+    dictionaryUpdate?: any | null;
   }) => void;
   setRemapResult: (result: {
     suggestions: EmotionSuggestion[];
@@ -77,7 +79,7 @@ interface CheckinState {
   setProcessing: (processing: boolean) => void;
   getZoneSensationCount: (zone: ZoneId) => number;
   getAverageIntensity: (zone: ZoneId) => number;
-  setBodyType: (type: BodyType) => void;
+  setBodyType: (type: BodyType | null) => void;
   reset: () => void;
 }
 
@@ -114,6 +116,7 @@ export const useCheckinStore = create<CheckinState>((set, get) => ({
   selectedEmotion: null,
   copingStrategies: [],
   communicationCard: null,
+  dictionaryUpdate: null,
   remapCount: 0,
   isCrisis: false,
   crisisMessage: null,
@@ -174,6 +177,7 @@ export const useCheckinStore = create<CheckinState>((set, get) => ({
   setSelectionResult: (result) => set({
     copingStrategies: result.copingStrategies,
     communicationCard: result.communicationCard,
+    dictionaryUpdate: result.dictionaryUpdate || null,
   }),
 
   setRemapResult: (result) => set({
@@ -214,6 +218,7 @@ export const useCheckinStore = create<CheckinState>((set, get) => ({
       selectedEmotion: null,
       copingStrategies: [],
       communicationCard: null,
+      dictionaryUpdate: null,
       remapCount: 0,
       isCrisis: false,
       crisisMessage: null,
