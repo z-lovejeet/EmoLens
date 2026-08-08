@@ -1,10 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { ArrowLeft, RotateCcw } from 'lucide-react';
 import { useCheckinStore } from '@/lib/store/checkinStore';
+import { saveCopingLocal } from '@/lib/db/local/operations';
+import { getDictionaryEntryByEmotion, upsertDictionaryLocal } from '@/lib/db/local/operations';
 import { ValidationMessage } from '@/components/results/ValidationMessage';
 import { EmotionCardList } from '@/components/results/EmotionCardList';
 import { CopingCardList } from '@/components/results/CopingCardList';
@@ -111,6 +113,53 @@ export default function ResultsPage() {
     router.push('/checkin');
   };
 
+  // ── Coping feedback persistence ──
+  const handleCopingFeedback = useCallback(
+    async (strategyName: string, helpful: boolean) => {
+      // Find the category from the strategy list
+      const strategy = copingStrategies.find((s) => s.name === strategyName);
+      const category = strategy?.category || 'cognitive';
+
+      try {
+        // 1. Save to copingLog in IndexedDB
+        await saveCopingLocal({
+          id: crypto.randomUUID(),
+          checkin_id: threadId,
+          strategy_name: strategyName,
+          category,
+          was_helpful: helpful,
+          created_at: new Date().toISOString(),
+        });
+
+        // 2. Update dictionary effective/ineffective coping
+        if (selectedEmotion) {
+          const existing = await getDictionaryEntryByEmotion(selectedEmotion);
+          if (existing) {
+            const effectiveSet = new Set(existing.effective_coping);
+            const ineffectiveSet = new Set(existing.ineffective_coping);
+
+            if (helpful) {
+              effectiveSet.add(strategyName);
+              ineffectiveSet.delete(strategyName);
+            } else {
+              ineffectiveSet.add(strategyName);
+              effectiveSet.delete(strategyName);
+            }
+
+            await upsertDictionaryLocal({
+              ...existing,
+              effective_coping: Array.from(effectiveSet),
+              ineffective_coping: Array.from(ineffectiveSet),
+            });
+          }
+        }
+      } catch (err) {
+        console.error('[CopingFeedback] Failed to persist:', err);
+      }
+    },
+    [copingStrategies, threadId, selectedEmotion]
+  );
+
   // Crisis view
   if (isCrisis && crisisMessage) {
     return (
@@ -193,7 +242,7 @@ export default function ResultsPage() {
           )}
 
           {copingStrategies.length > 0 && (
-            <CopingCardList strategies={copingStrategies} />
+            <CopingCardList strategies={copingStrategies} onFeedback={handleCopingFeedback} />
           )}
 
           {communicationCard && (
