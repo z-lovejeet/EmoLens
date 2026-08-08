@@ -1,0 +1,221 @@
+.page {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+  background: linear-gradient(145deg, #0a0a0f 0%, #141420 50%, #0d0d15 100%);
+  font-family: var(--font-body);
+}
+
+/* Card */
+.card {
+  width: 100%;
+  max-width: 400px;
+  padding: var(--space-10) var(--space-8);
+  border-radius: 28px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  backdrop-filter: blur(32px) saturate(1.4);
+  -webkit-backdrop-filter: blur(32px) saturate(1.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 24px 80px rgba(0, 0, 0, 0.5),
+    0 0 1px rgba(255, 255, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  animation: cardEntrance 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes cardEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Label */
+.label {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.02em;
+}
+
+/* Emotion */
+.emotion {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #f0f0f5;
+  text-transform: capitalize;
+  font-family: var(--font-heading);
+  letter-spacing: -0.01em;
+}
+
+/* Intensity Badge */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 18px;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: var(--intensity-bg, rgba(142, 202, 230, 0.15));
+  color: var(--intensity-color, #8ecae6);
+  border: 1px solid color-mix(in srgb, var(--intensity-color, #8ecae6) 30%, transparent);
+  line-height: 1;
+}
+
+/* Divider */
+.divider {
+  width: 50%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.12) 50%,
+    transparent 100%
+  );
+  margin: var(--space-1) 0;
+}
+
+/* Help Section */
+.helpSection {
+  width: 100%;
+  text-align: left;
+}
+
+.helpTitle {
+  margin: 0 0 var(--space-4);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.helpList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.helpItem {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.88);
+  line-height: 1.5;
+}
+
+.helpDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--intensity-color, #8ecae6);
+  flex-shrink: 0;
+  margin-top: 7px;
+}
+
+/* Validation */
+.validation {
+  margin: 0;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.6;
+  font-style: italic;
+  text-align: center;
+  max-width: 320px;
+}
+
+/* Powered By */
+.poweredBy {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: var(--space-6);
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.25);
+  letter-spacing: 0.03em;
+}
+
+/* Loading */
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.loadingPulse {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(142, 202, 230, 0.15);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.4; transform: scale(0.95); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+.loadingText {
+  margin: 0;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Error */
+.errorContainer {
+  text-align: center;
+  max-width: 360px;
+}
+
+.errorTitle {
+  margin: 0 0 var(--space-3);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.errorText {
+  margin: 0;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.4);
+  line-height: 1.5;
+}
+
+@media (max-width: 480px) {
+  .page {
+    padding: var(--space-4);
+  }
+
+  .card {
+    padding: var(--space-8) var(--space-6);
+  }
+
+  .emotion {
+    font-size: 1.75rem;
+  }
+}
