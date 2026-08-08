@@ -39,27 +39,32 @@ export default function LandingPage() {
     <main className={styles.main}>
       {/* ── Hero ── */}
       <section className={styles.heroSection}>
-        <div className={styles.heroBackground} />
+        <div className={styles.heroBackground}>
+          <div className={styles.orbPrimary} />
+          <div className={styles.orbSecondary} />
+          <div className={styles.orbAccent} />
+        </div>
 
-        <motion.img
-          src="/logo.jpg"
-          alt="EmoLens Logo"
-          className={styles.logo}
+        <motion.div
+          className={styles.heroBadge}
           initial="hidden"
           animate="visible"
           variants={scaleVariant}
-          transition={{ type: 'spring', stiffness: 100, damping: 20, ...getTransition(0, 0.6) }}
-        />
+          transition={getTransition(0, 0.5)}
+        >
+          <Sparkles size={13} />
+          <span>AI for Connection &amp; Wellbeing</span>
+        </motion.div>
 
         <motion.h1
           className={styles.heroTitle}
           initial="hidden"
           animate="visible"
           variants={fadeUpVariant}
-          transition={getTransition(0, 0.8)}
+          transition={getTransition(0.15, 0.9)}
         >
-          Map Your Body.<br />
-          Find Your Words.
+          <span className={styles.heroTitleLine1}>Map Your Body.</span>
+          <span className={styles.heroTitleLine2}>Find Your Words.</span>
         </motion.h1>
 
         <motion.p
@@ -67,30 +72,45 @@ export default function LandingPage() {
           initial="hidden"
           animate="visible"
           variants={fadeUpVariant}
-          transition={getTransition(0.3, 0.8)}
+          transition={getTransition(0.35, 0.8)}
         >
-          Your body speaks before you do. We gently translate physical sensations
-          into clear emotional understanding, giving you the exact words to
-          express how you truly feel.
+          Your body speaks before you do. EmoLens gently translates physical
+          sensations into emotional vocabulary — giving neurodivergent youth the
+          words to express what they already feel.
         </motion.p>
 
         <motion.div
+          className={styles.heroActions}
           initial="hidden"
           animate="visible"
           variants={{
-            hidden: { opacity: 0, scale: prefersReducedMotion ? 1 : 0.95 },
-            visible: { opacity: 1, scale: 1 },
+            hidden: { opacity: 0, y: prefersReducedMotion ? 0 : 12 },
+            visible: { opacity: 1, y: 0 },
           }}
-          transition={getTransition(0.6, 0.5)}
+          transition={getTransition(0.55, 0.6)}
         >
           <Link href="/checkin" className={styles.primaryButton}>
             Start Check-In
+            <ArrowRight size={18} className={styles.btnArrow} />
+          </Link>
+          <Link href="#problem" className={styles.secondaryButton}>
+            Learn More
           </Link>
         </motion.div>
+
+        <motion.p
+          className={styles.heroTagline}
+          initial="hidden"
+          animate="visible"
+          variants={fadeUpVariant}
+          transition={getTransition(0.7, 0.6)}
+        >
+          Free &middot; No sign-up required &middot; Privacy-first
+        </motion.p>
       </section>
 
       {/* ── Problem Statement ── */}
-      <section className={styles.problemSection}>
+      <section id="problem" className={styles.problemSection}>
         <motion.div
           className={styles.sectionBadge}
           initial="hidden"

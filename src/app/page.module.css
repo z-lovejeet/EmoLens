@@ -8,7 +8,7 @@
   overflow-x: hidden;
 }
 
-/* --- Hero Section --- */
+/* ── Hero Section ── */
 .heroSection {
   position: relative;
   min-height: 100vh;
@@ -17,87 +17,196 @@
   justify-content: center;
   align-items: center;
   text-align: center;
-  padding: var(--space-6);
+  padding: var(--space-6) var(--space-6) var(--space-10);
   z-index: 1;
+  overflow: hidden;
 }
 
+/* Background: triple floating orbs */
 .heroBackground {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   z-index: -1;
   overflow: hidden;
 }
 
-.heroBackground::before {
-  content: "";
+.orbPrimary,
+.orbSecondary,
+.orbAccent {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 80vw;
-  height: 80vw;
-  max-width: 800px;
-  max-height: 800px;
-  transform: translate(-50%, -50%);
-  background: radial-gradient(circle, rgba(142, 202, 230, 0.15) 0%, rgba(33, 158, 188, 0.05) 40%, transparent 70%);
-  filter: blur(60px);
   border-radius: 50%;
+  filter: blur(80px);
+  will-change: transform;
 }
 
-.logo {
-  width: 80px;
-  height: 80px;
-  border-radius: 20px;
-  margin-bottom: var(--space-8);
-  box-shadow: 0 0 20px rgba(142, 202, 230, 0.2);
-  object-fit: cover;
+.orbPrimary {
+  width: 55vw;
+  height: 55vw;
+  max-width: 700px;
+  max-height: 700px;
+  top: 10%;
+  left: 50%;
+  transform: translate(-50%, -20%);
+  background: radial-gradient(circle, rgba(142, 202, 230, 0.18) 0%, rgba(33, 158, 188, 0.06) 50%, transparent 75%);
+  animation: orbDrift1 18s ease-in-out infinite alternate;
 }
 
+.orbSecondary {
+  width: 35vw;
+  height: 35vw;
+  max-width: 450px;
+  max-height: 450px;
+  bottom: 8%;
+  left: 5%;
+  background: radial-gradient(circle, rgba(184, 169, 201, 0.16) 0%, rgba(147, 123, 178, 0.04) 60%, transparent 80%);
+  animation: orbDrift2 22s ease-in-out infinite alternate;
+}
+
+.orbAccent {
+  width: 28vw;
+  height: 28vw;
+  max-width: 350px;
+  max-height: 350px;
+  top: 30%;
+  right: 2%;
+  background: radial-gradient(circle, rgba(212, 128, 122, 0.12) 0%, rgba(212, 128, 122, 0.03) 55%, transparent 80%);
+  animation: orbDrift3 20s ease-in-out infinite alternate;
+}
+
+@keyframes orbDrift1 {
+  0% { transform: translate(-50%, -20%); }
+  100% { transform: translate(-48%, -16%); }
+}
+@keyframes orbDrift2 {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(18px, -24px); }
+}
+@keyframes orbDrift3 {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(-14px, 20px); }
+}
+
+/* Badge pill */
+.heroBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  border-radius: var(--radius-full);
+  background: rgba(142, 202, 230, 0.08);
+  border: 1px solid rgba(142, 202, 230, 0.2);
+  color: #8ecae6;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: var(--space-6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Title — two-line gradient */
 .heroTitle {
   font-family: var(--font-outfit);
-  font-size: var(--text-4xl);
-  font-weight: 700;
-  line-height: 1.1;
+  font-size: clamp(2.4rem, 6vw, 4rem);
+  font-weight: 800;
+  line-height: 1.08;
   margin-bottom: var(--space-6);
-  background: linear-gradient(135deg, #ffffff 0%, #8ecae6 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.heroTitleLine1 {
+  background: linear-gradient(135deg, #ffffff 20%, #8ecae6 80%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  text-fill-color: transparent;
 }
 
-@media (min-width: 768px) {
-  .heroTitle {
-    font-size: var(--text-5xl);
-  }
+.heroTitleLine2 {
+  background: linear-gradient(135deg, #8ecae6 10%, #b8a9c9 70%, #d4807a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .heroSubtitle {
   font-size: var(--text-lg);
   color: var(--text-secondary);
-  max-width: 560px;
+  max-width: 540px;
   margin: 0 auto var(--space-8) auto;
-  line-height: 1.6;
+  line-height: 1.7;
+}
+
+/* Actions row */
+.heroActions {
+  display: flex;
+  gap: var(--space-4);
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: var(--space-5);
 }
 
 .primaryButton {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--interactive-primary);
+  gap: 8px;
+  background: linear-gradient(135deg, var(--interactive-primary) 0%, #219ebc 100%);
   color: #ffffff;
-  font-weight: 500;
-  border-radius: var(--radius-md);
-  padding: var(--space-3) var(--space-8);
+  font-weight: 600;
+  font-size: var(--text-sm);
+  border-radius: var(--radius-full);
+  padding: 14px 32px;
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 20px rgba(33, 158, 188, 0.25);
 }
 
 .primaryButton:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 8px 32px rgba(33, 158, 188, 0.35);
+}
+
+.primaryButton:hover .btnArrow {
+  transform: translateX(3px);
+}
+
+.btnArrow {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.secondaryButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: var(--text-sm);
+  border-radius: var(--radius-full);
+  padding: 14px 28px;
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.secondaryButton:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(142, 202, 230, 0.3);
+  color: var(--text-primary);
+  transform: translateY(-1px);
+}
+
+/* Trust tagline */
+.heroTagline {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  letter-spacing: 0.04em;
 }
 
 /* --- How It Works Section --- */
