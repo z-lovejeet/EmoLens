@@ -38,6 +38,46 @@ const copingCardVariant = {
   },
 };
 
+interface ParsedStep {
+  stepNum: number;
+  text: string;
+}
+
+function parseInstructionsSteps(fullInstructions: string): ParsedStep[] {
+  if (!fullInstructions) return [];
+
+  // Match "Step 1: ...", "Step 2: ..." or "1. ... 2. ..." pattern
+  const stepRegex = /(?:Step\s*(\d+)[\:\.\-\s]*|(\d+)[\:\.\-\s]+)/gi;
+  const matches = [...fullInstructions.matchAll(stepRegex)];
+
+  if (matches.length > 0) {
+    const steps: ParsedStep[] = [];
+    for (let i = 0; i < matches.length; i++) {
+      const match = matches[i];
+      const nextMatch = matches[i + 1];
+      const startIdx = match.index! + match[0].length;
+      const endIdx = nextMatch ? nextMatch.index! : fullInstructions.length;
+      const stepText = fullInstructions.slice(startIdx, endIdx).trim();
+      const num = parseInt(match[1] || match[2] || `${i + 1}`, 10);
+      if (stepText) {
+        steps.push({ stepNum: num, text: stepText });
+      }
+    }
+    if (steps.length > 0) return steps;
+  }
+
+  // Fallback: split by newlines
+  const lines = fullInstructions.split(/\n+/).map((l) => l.trim()).filter(Boolean);
+  if (lines.length > 1) {
+    return lines.map((line, idx) => ({
+      stepNum: idx + 1,
+      text: line.replace(/^(?:Step\s*\d+[\:\.\-\s]*|\d+[\:\.\-\s]+)/i, ''),
+    }));
+  }
+
+  return [{ stepNum: 1, text: fullInstructions }];
+}
+
 export function CopingCard({
   name,
   icon,
@@ -54,6 +94,8 @@ export function CopingCard({
     setFeedback(helpful);
     onFeedback?.(helpful);
   };
+
+  const parsedSteps = parseInstructionsSteps(fullInstructions);
 
   return (
     <motion.div className={styles.card} variants={copingCardVariant}>
@@ -93,12 +135,24 @@ export function CopingCard({
           >
             <div className={styles.instructions}>
               <h5 className={styles.instructionsTitle}>How to do it:</h5>
-              <p className={styles.instructionsText}>{fullInstructions}</p>
+              <div className={styles.stepsList}>
+                {parsedSteps.map((step, idx) => (
+                  <div key={`step-${idx}-${step.stepNum}`} className={styles.stepRow}>
+                    <span className={styles.stepBadge}>Step {step.stepNum}</span>
+                    <span className={styles.stepText}>{step.text}</span>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            <div className={styles.matchBox}>
-              <p className={styles.matchReason}>💡 {matchReason}</p>
-            </div>
+            {matchReason && (
+              <div className={styles.matchBox}>
+                <div className={styles.matchReason}>
+                  <LucideIcons.Sparkles size={14} className={styles.matchIcon} />
+                  <span>{matchReason}</span>
+                </div>
+              </div>
+            )}
 
             {/* Feedback */}
             <div className={styles.feedbackRow}>
