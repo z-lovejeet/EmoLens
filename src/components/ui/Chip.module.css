@@ -5,6 +5,7 @@
   font-size: var(--text-sm);
   font-weight: 500;
   padding: var(--space-2) 14px;
+  min-height: 44px;
   border-radius: var(--radius-full);
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(255, 255, 255, 0.05);
@@ -17,10 +18,6 @@
   user-select: none;
 }
 
-[data-theme="light"] .chip {
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  background: rgba(0, 0, 0, 0.04);
-}
 
 .chip:hover {
   background: rgba(255, 255, 255, 0.12);
@@ -29,10 +26,6 @@
   transform: translateY(-1px);
 }
 
-[data-theme="light"] .chip:hover {
-  background: rgba(0, 0, 0, 0.08);
-  border-color: rgba(0, 0, 0, 0.15);
-}
 
 .chip:focus-visible {
   box-shadow: 0 0 0 2px var(--surface-base), 0 0 0 4px var(--border-focus);
