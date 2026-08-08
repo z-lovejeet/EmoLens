@@ -46,6 +46,8 @@ interface CheckinState {
   remapCount: number;
   isCrisis: boolean;
   crisisMessage: string | null;
+  savedCardIds: string[];
+  markCardSaved: (cardId: string) => void;
 
   // Results actions
   setCheckinResult: (result: {
@@ -115,6 +117,7 @@ export const useCheckinStore = create<CheckinState>((set, get) => ({
   remapCount: 0,
   isCrisis: false,
   crisisMessage: null,
+  savedCardIds: [],
 
   setBodyType: (type) => set({ bodyType: type }),
   selectZone: (zone, isRear = false) => set({ activeZone: zone, activeZoneIsRear: isRear, isZoomed: true }),
@@ -180,6 +183,12 @@ export const useCheckinStore = create<CheckinState>((set, get) => ({
 
   incrementRemapCount: () => set((state) => ({ remapCount: state.remapCount + 1 })),
 
+  markCardSaved: (cardId) => set((state) => ({
+    savedCardIds: state.savedCardIds.includes(cardId)
+      ? state.savedCardIds
+      : [...state.savedCardIds, cardId],
+  })),
+
   getZoneSensationCount: (zone) => get().zoneData[zone].sensations.length,
 
   getAverageIntensity: (zone) => {
@@ -208,6 +217,7 @@ export const useCheckinStore = create<CheckinState>((set, get) => ({
       remapCount: 0,
       isCrisis: false,
       crisisMessage: null,
+      savedCardIds: [],
     }),
 }));
 
