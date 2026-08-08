@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Outfit, Inter } from 'next/font/google';
 import { Navigation } from '@/components/layout/Navigation';
+import { Footer } from '@/components/layout/Footer';
 import { Toast } from '@/components/ui/Toast';
 import { AuthProvider } from '@/components/auth/AuthProvider';
 import './globals.css';
@@ -54,35 +55,16 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${outfit.variable} ${inter.variable}`}
+      data-theme="dark"
       suppressHydrationWarning
     >
       <head>
-        {/* Inline script to prevent flash of wrong theme */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  var theme = localStorage.getItem('emolens-theme');
-                  if (theme === 'light' || theme === 'dark') {
-                    document.documentElement.setAttribute('data-theme', theme);
-                  } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                    document.documentElement.setAttribute('data-theme', 'dark');
-                  } else {
-                    document.documentElement.setAttribute('data-theme', 'dark');
-                  }
-                } catch (e) {
-                  document.documentElement.setAttribute('data-theme', 'dark');
-                }
-              })();
-            `,
-          }}
-        />
       </head>
       <body>
         <AuthProvider>
           <Navigation />
           {children}
+          <Footer />
           <Toast />
         </AuthProvider>
       </body>

@@ -123,51 +123,16 @@
   --z-toast:      70;
   --z-tooltip:    80;
   --z-crisis:     100;
+
+  /* ── Glass Backgrounds ── */
+  --bg-glass:          rgba(20, 20, 24, 0.72);
+  --bg-glass-elevated: rgba(20, 20, 24, 0.85);
 }
 
 /* ── Layer 2: Semantic Tokens — Light Mode ── */
-[data-theme="light"] {
-  /* Surfaces */
-  --surface-base:       var(--color-stone-50);
-  --surface-primary:    #ffffff;
-  --surface-secondary:  var(--color-stone-100);
-  --surface-tertiary:   var(--color-stone-200);
-  --surface-elevated:   #ffffff;
-  --surface-overlay:    rgba(255, 255, 255, 0.72);
-  --surface-inverse:    var(--color-stone-900);
-
-  /* Text */
-  --text-primary:     var(--color-ink-900);
-  --text-secondary:   var(--color-ink-600);
-  --text-tertiary:    var(--color-ink-500);
-  --text-disabled:    var(--color-ink-400);
-  --text-inverse:     var(--color-stone-50);
-  --text-accent:      var(--color-teal-600);
-
-  /* Borders */
-  --border-default:   var(--color-stone-200);
-  --border-subtle:    var(--color-stone-100);
-  --border-strong:    var(--color-stone-300);
-  --border-focus:     var(--color-teal-400);
-  --border-accent:    var(--color-teal-300);
-
-  /* Interactive */
-  --interactive-primary:       var(--color-teal-500);
-  --interactive-primary-hover: var(--color-teal-600);
-  --interactive-primary-active:var(--color-teal-700);
-  --interactive-secondary:     var(--color-stone-200);
-  --interactive-secondary-hover: var(--color-stone-300);
-
-  /* Shadows */
-  --shadow-xs:  0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-sm:  0 2px 4px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
-  --shadow-md:  0 4px 12px rgba(0, 0, 0, 0.06), 0 2px 4px rgba(0, 0, 0, 0.03);
-  --shadow-lg:  0 8px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.04);
-  --shadow-xl:  0 16px 48px rgba(0, 0, 0, 0.10), 0 8px 16px rgba(0, 0, 0, 0.05);
-}
 
 /* ── Layer 2: Semantic Tokens — Dark Mode ── */
-[data-theme="dark"] {
+:root {
   /* Surfaces */
   --surface-base:       #0a0a0f;
   --surface-primary:    #141418;
@@ -208,38 +173,6 @@
 }
 
 /* ── System preference auto-detection ── */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --surface-base:       #0a0a0f;
-    --surface-primary:    #141418;
-    --surface-secondary:  #1c1c22;
-    --surface-tertiary:   #24242c;
-    --surface-elevated:   #1a1a20;
-    --surface-overlay:    rgba(20, 20, 24, 0.72);
-    --surface-inverse:    var(--color-stone-100);
-    --text-primary:     #e8e0d8;
-    --text-secondary:   #a09890;
-    --text-tertiary:    #706860;
-    --text-disabled:    #504840;
-    --text-inverse:     var(--color-ink-900);
-    --text-accent:      var(--color-teal-300);
-    --border-default:   rgba(255, 255, 255, 0.08);
-    --border-subtle:    rgba(255, 255, 255, 0.04);
-    --border-strong:    rgba(255, 255, 255, 0.12);
-    --border-focus:     var(--color-teal-400);
-    --border-accent:    var(--color-teal-300);
-    --interactive-primary:       var(--color-teal-400);
-    --interactive-primary-hover: var(--color-teal-300);
-    --interactive-primary-active:var(--color-teal-200);
-    --interactive-secondary:     rgba(255, 255, 255, 0.06);
-    --interactive-secondary-hover: rgba(255, 255, 255, 0.10);
-    --shadow-xs:  0 1px 2px rgba(0, 0, 0, 0.2);
-    --shadow-sm:  0 2px 6px rgba(0, 0, 0, 0.3);
-    --shadow-md:  0 4px 16px rgba(0, 0, 0, 0.4);
-    --shadow-lg:  0 8px 32px rgba(0, 0, 0, 0.5);
-    --shadow-xl:  0 16px 64px rgba(0, 0, 0, 0.6);
-  }
-}
 
 /* ═══════════════════════════════════════════════════════
    CSS Reset & Base
@@ -283,7 +216,7 @@ a {
 }
 
 a:hover {
-  text-decoration: underline;
+  text-decoration: none;
 }
 
 img, video, svg {
