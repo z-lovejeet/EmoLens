@@ -12,6 +12,19 @@ export default function HomePage() {
         gap: 'var(--space-6)',
       }}
     >
+      <img
+        src="/logo.jpg"
+        alt="EmoLens Logo"
+        style={{
+          width: '96px',
+          height: '96px',
+          borderRadius: '50%',
+          objectFit: 'cover',
+          border: '2px solid rgba(142, 202, 230, 0.3)',
+          boxShadow: '0 0 32px rgba(142, 202, 230, 0.3)',
+          marginBottom: 'var(--space-2)',
+        }}
+      />
       <h1
         style={{
           fontFamily: 'var(--font-outfit), system-ui, sans-serif',

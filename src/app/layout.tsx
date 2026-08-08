@@ -23,6 +23,11 @@ export const metadata: Metadata = {
   title: 'EmoLens — Map Your Body, Find Your Words',
   description:
     'AI-powered tool helping neurodivergent youth identify emotions through body sensations. Body-first, not label-first.',
+  icons: {
+    icon: '/logo.jpg',
+    shortcut: '/logo.jpg',
+    apple: '/logo.jpg',
+  },
   keywords: [
     'emotional awareness',
     'neurodivergent',
