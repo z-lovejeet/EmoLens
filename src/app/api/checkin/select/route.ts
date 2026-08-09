@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server';
 import { emotionGraph } from '@/lib/ai/graph';
 import { checkRateLimit, getClientIdentifier } from '@/lib/ai/rateLimit';
+import type { BodyZoneInput } from '@/lib/ai/state';
 
 interface SelectionRequest {
   threadId: string;
   selectedEmotion: string;
+  bodyData?: BodyZoneInput[];
   userId?: string;
   sensoryPreferences?: string[];
 }
@@ -30,11 +32,12 @@ export async function POST(request: Request) {
       );
     }
 
-    // Resume the graph from the HITL pause point
-    // Phase 2: updateDictionary -> suggestCoping -> generateCard -> END
+    // Invoke the graph for Phase 2: updateDictionary -> suggestCoping -> generateCard -> END
+    // Pass bodyData explicitly for serverless compatibility (MemorySaver is in-memory only)
     const result = await emotionGraph.invoke(
       {
         selectedEmotion: body.selectedEmotion,
+        bodyData: body.bodyData ?? [],
         sensoryPreferences: body.sensoryPreferences ?? [],
       },
       {

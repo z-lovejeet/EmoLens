@@ -131,12 +131,21 @@ export default function ResultsPage() {
     setLoadingMsgIndex(0);
 
     try {
+      // Build bodyData from store for serverless compatibility
+      const bodyDataForApi = Object.entries(zoneData)
+        .filter(([, data]) => data.sensations.length > 0)
+        .map(([zone, data]) => ({
+          zone,
+          sensations: data.sensations,
+        }));
+
       const response = await fetch('/api/checkin/select', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           threadId,
           selectedEmotion: emotion,
+          bodyData: bodyDataForApi,
         }),
       });
 
