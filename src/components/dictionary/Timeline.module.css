@@ -1,0 +1,148 @@
+.section {
+  margin: 2rem 0;
+  padding: 1.5rem 0;
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0 1rem;
+}
+
+.titleWrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-primary);
+}
+
+.titleIcon {
+  color: var(--color-teal-400);
+}
+
+.title {
+  font-family: var(--font-outfit);
+  font-size: 1.125rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+.statsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.statPill {
+  display: inline-flex;
+  align-items: center;
+  background: var(--surface-2);
+  border: 1px solid var(--border-default);
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.timelineContainer {
+  position: relative;
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 1rem;
+  gap: 1.5rem;
+  /* Hide scrollbar */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.timelineContainer::-webkit-scrollbar {
+  display: none;
+}
+
+.nodeWrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 140px;
+  scroll-snap-align: center;
+  flex: 0 0 auto;
+}
+
+.connector {
+  position: absolute;
+  top: 19px; /* Align with center of the dot, assuming dot + padding */
+  left: 50%;
+  width: 100%;
+  height: 2px;
+  background: var(--border-default);
+  z-index: 0;
+}
+
+.connectorSpacer {
+  width: calc(100% + 1.5rem);
+}
+
+.dotContainer {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin-bottom: 0.75rem;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  box-shadow: 0 0 10px currentColor;
+}
+
+.card {
+  background: var(--surface-1);
+  border: 1px solid var(--border-default);
+  border-radius: 12px;
+  padding: 1rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.5rem;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.emotionName {
+  font-weight: 500;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  text-transform: capitalize;
+  margin: 0;
+}
+
+.date {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.badge {
+  background: var(--surface-3);
+  color: var(--text-primary);
+  font-size: 0.65rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 999px;
+  font-weight: 600;
+}

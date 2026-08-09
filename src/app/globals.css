@@ -390,3 +390,22 @@ input, textarea, select {
     padding-inline: var(--space-8);
   }
 }
+
+/* Accessibility overrides */
+.reduced-motion * {
+  animation-duration: 0.01s !important;
+  transition-duration: 0.01s !important;
+}
+.font-large {
+  font-size: 112.5% !important; /* 18px base */
+}
+.font-xl {
+  font-size: 125% !important; /* 20px base */
+}
+.high-contrast {
+  --text-primary: #ffffff;
+  --text-secondary: #d4ccc4;
+  --text-tertiary: #a09890;
+  --border-default: rgba(255, 255, 255, 0.16);
+  --border-subtle: rgba(255, 255, 255, 0.08);
+}

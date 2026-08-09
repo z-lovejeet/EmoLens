@@ -2,9 +2,11 @@
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Scan, BookOpen } from 'lucide-react';
+import { Scan, BookOpen, Settings2 } from 'lucide-react';
 import { AuthButton } from '@/components/auth/AuthButton';
+import { AccessibilityPanel } from './AccessibilityPanel';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import styles from './Navigation.module.css';
 
@@ -16,6 +18,7 @@ const NAV_ITEMS = [
 export function Navigation() {
   const pathname = usePathname();
   const prefersReducedMotion = useReducedMotion();
+  const [a11yOpen, setA11yOpen] = useState(false);
 
   return (
     <header className={`${styles.header} ${styles.navTransparent}`}>
@@ -61,11 +64,20 @@ export function Navigation() {
 
           {/* Right controls */}
           <div className={styles.rightControls}>
+            <button
+              className={styles.themeToggle}
+              onClick={() => setA11yOpen(true)}
+              aria-label="Accessibility settings"
+            >
+              <Settings2 size={24} />
+            </button>
             {/* Auth button (far right) */}
             <AuthButton />
           </div>
         </div>
       </nav>
+      
+      <AccessibilityPanel isOpen={a11yOpen} onClose={() => setA11yOpen(false)} />
     </header>
   );
 }

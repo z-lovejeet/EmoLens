@@ -14,6 +14,7 @@ import { EmotionCardList } from '@/components/results/EmotionCardList';
 import { CopingCardList } from '@/components/results/CopingCardList';
 import { CommunicationCard } from '@/components/results/CommunicationCard';
 import { CrisisMessage } from '@/components/results/CrisisMessage';
+import { BreathingExercise } from '@/components/results/BreathingExercise';
 import { ErrorState } from '@/components/ui/ErrorState';
 import styles from './page.module.css';
 
@@ -56,6 +57,7 @@ export default function ResultsPage() {
   const [loadingMsgIndex, setLoadingMsgIndex] = useState(0);
   const [isSavingDict, setIsSavingDict] = useState(false);
   const [isDictSaved, setIsDictSaved] = useState(false);
+  const [showBreathing, setShowBreathing] = useState(true);
   const retryActionRef = useRef<(() => void) | null>(null);
 
   // Redirect if no data & ensure processing state is clear on mount
@@ -247,7 +249,11 @@ export default function ResultsPage() {
             <span>Back</span>
           </button>
         </div>
-        <CrisisMessage message={crisisMessage} />
+        {showBreathing ? (
+          <BreathingExercise onSkip={() => setShowBreathing(false)} />
+        ) : (
+          <CrisisMessage message={crisisMessage} />
+        )}
       </main>
     );
   }

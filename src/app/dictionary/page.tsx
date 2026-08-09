@@ -7,6 +7,7 @@ import { useDictionaryStore } from '@/lib/store/dictionaryStore';
 import { DictionaryEntry } from '@/components/dictionary/DictionaryEntry';
 import { EmptyState } from '@/components/dictionary/EmptyState';
 import { SkeletonCard } from '@/components/ui/Skeleton';
+import { Timeline } from '@/components/dictionary/Timeline';
 import styles from './page.module.css';
 
 const containerVariants = {
@@ -81,6 +82,9 @@ export default function DictionaryPage() {
           <EmptyState />
         </motion.div>
       )}
+
+      {/* Timeline */}
+      {isLoaded && entries.length >= 2 && <Timeline entries={entries} />}
 
       {/* Entry grid */}
       {isLoaded && entries.length > 0 && (
