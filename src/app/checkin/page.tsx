@@ -108,48 +108,48 @@ export default function CheckinPage() {
           .join(' ')}
       >
         <BodyScene />
-
-        {/* Zone header overlay when zoomed */}
-        {isZoomed && activeZone && (
-          <div className={styles.overlay}>
-            <Button
-              variant="ghost"
-              size="sm"
-              icon={<ArrowLeft size={18} />}
-              onClick={deselectZone}
-              className={styles.backBtn}
-            >
-              Back
-            </Button>
-            <div className={styles.zoneInfo}>
-              <h2 className={styles.zoneName}>{ZONE_LABELS[activeZone]}</h2>
-              <p className={styles.zoneHint}>Tap sensations you feel here</p>
-            </div>
-          </div>
-        )}
-
-        {/* Change model button when not zoomed */}
-        {!isZoomed && bodyType && (
-          <div className={styles.topActions}>
-            <Button
-              variant="ghost"
-              size="sm"
-              icon={<ArrowLeft size={18} />}
-              onClick={() => setBodyType(null)}
-              className={styles.changeModelBtn}
-            >
-              Change Model
-            </Button>
-          </div>
-        )}
-
-        {/* Instructions when not zoomed */}
-        {!isZoomed && bodyType && totalSensations === 0 && (
-          <div className={styles.instructions}>
-            <p>Tap a body zone to begin</p>
-          </div>
-        )}
       </div>
+
+      {/* Zone header overlay when zoomed */}
+      {isZoomed && activeZone && (
+        <div className={styles.overlay}>
+          <Button
+            variant="ghost"
+            size="sm"
+            icon={<ArrowLeft size={18} />}
+            onClick={deselectZone}
+            className={styles.backBtn}
+          >
+            Back
+          </Button>
+          <div className={styles.zoneInfo}>
+            <h2 className={styles.zoneName}>{ZONE_LABELS[activeZone]}</h2>
+            <p className={styles.zoneHint}>Tap sensations you feel here</p>
+          </div>
+        </div>
+      )}
+
+      {/* Change model button when not zoomed */}
+      {!isZoomed && bodyType && (
+        <div className={styles.topActions}>
+          <Button
+            variant="ghost"
+            size="sm"
+            icon={<ArrowLeft size={18} />}
+            onClick={() => setBodyType(null)}
+            className={styles.changeModelBtn}
+          >
+            Change Model
+          </Button>
+        </div>
+      )}
+
+      {/* Instructions when not zoomed */}
+      {!isZoomed && bodyType && totalSensations === 0 && (
+        <div className={styles.instructions}>
+          <p>Tap a body zone to begin</p>
+        </div>
+      )}
 
       {/* Sensation panel (drawer on mobile, side panel on desktop) */}
       <AnimatePresence>

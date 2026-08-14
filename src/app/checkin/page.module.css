@@ -69,6 +69,14 @@
   pointer-events: auto;
 }
 
+@media (min-width: 1024px) {
+  .overlay,
+  .topActions {
+    top: calc(56px + var(--space-4));
+    left: var(--space-6);
+  }
+}
+
 .changeModelBtn {
   background: rgba(20, 20, 26, 0.8) !important;
   backdrop-filter: blur(16px);
