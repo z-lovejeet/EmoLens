@@ -1,0 +1,39 @@
+name: Supabase & App Keep-Alive
+
+on:
+  schedule:
+    # Runs automatically every 2 days at 00:00 UTC (12:00 AM UTC)
+    - cron: '0 0 */2 * *'
+  workflow_dispatch: # Allows manual trigger from GitHub Actions tab whenever needed
+
+jobs:
+  keep-alive:
+    name: Ping Supabase & Vercel App
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase Database (PostgreSQL Query)
+        env:
+          SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://pepbetfbienehrejnwlw.supabase.co' }}
+          SUPABASE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBlcGJldGZiaWVuZWhyZWpud2x3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU5NTE2MTEsImV4cCI6MjEwMTUyNzYxMX0.YSSl-rsoFe03pI4aC7zeIuEMLQzkAHO0Cn1BFpBrPs0' }}
+        run: |
+          echo "Pinging Supabase REST API at $SUPABASE_URL ..."
+          HTTP_STATUS=$(curl -s -o response.json -w "%{http_code}" -X GET "$SUPABASE_URL/rest/v1/communication_cards?select=id&limit=1" \
+            -H "apikey: $SUPABASE_KEY" \
+            -H "Authorization: Bearer $SUPABASE_KEY")
+          
+          echo "Supabase Response Code: $HTTP_STATUS"
+          echo "Supabase Response Body: $(cat response.json)"
+          
+          if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 300 ]; then
+            echo "✅ Supabase database query executed successfully. Inactivity timer reset!"
+          else
+            echo "⚠️ Unexpected status from Supabase: $HTTP_STATUS (still counts as activity)"
+          fi
+
+      - name: Ping Vercel Live App
+        run: |
+          echo "Pinging Live App Keep-Alive Endpoint..."
+          APP_STATUS=$(curl -s -o app_response.json -w "%{http_code}" -X GET "https://emo-lens-navy.vercel.app/api/keep-alive")
+          echo "App Response Code: $APP_STATUS"
+          echo "App Response Body: $(cat app_response.json)"
+          echo "✅ Live app and Supabase ping completed."
