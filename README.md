@@ -13,9 +13,10 @@
 </p>
 
 <p align="center">
-  <a href="#-the-problem"><img src="https://img.shields.io/badge/Track_2-AI_for_Connection_%26_Wellbeing-8ecae6?style=for-the-badge&labelColor=1a1b2e" alt="Track 2 — AI for Connection & Wellbeing" /></a>
+  <a href="#-recognition--awards"><img src="https://img.shields.io/badge/🏆_Grand_Prize_Winner-IncludAI_Hackathon_2026-FFD700?style=for-the-badge&labelColor=1a1b2e" alt="Grand Prize Winner — IncludAI Hackathon 2026" /></a>
+  <a href="#-recognition--awards"><img src="https://img.shields.io/badge/Stanford_NNEA-Featured_Project-8C1515?style=for-the-badge&labelColor=1a1b2e" alt="Featured at Stanford NNEA" /></a>
   <a href="#-tech-stack"><img src="https://img.shields.io/badge/Next.js_16-black?style=for-the-badge&logo=next.js&logoColor=white" alt="Next.js 16" /></a>
-  <a href="#-ai-architecture"><img src="https://img.shields.io/badge/Gemini_3.6_Flash-4285F4?style=for-the-badge&logo=google&logoColor=white" alt="Gemini 3.6 Flash" /></a>
+  <a href="#-ai-architecture"><img src="https://img.shields.io/badge/Gemini_AI-4285F4?style=for-the-badge&logo=google&logoColor=white" alt="Gemini AI" /></a>
   <a href="#-ai-architecture"><img src="https://img.shields.io/badge/LangGraph_JS-1C3C3C?style=for-the-badge&logo=langchain&logoColor=white" alt="LangGraph JS" /></a>
   <a href="#-3d-body-mapping"><img src="https://img.shields.io/badge/React_Three_Fiber-000000?style=for-the-badge&logo=three.js&logoColor=white" alt="React Three Fiber" /></a>
   <a href="#-data--privacy"><img src="https://img.shields.io/badge/Supabase-3FCF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase" /></a>
@@ -23,7 +24,8 @@
 
 <p align="center">
   <strong><a href="https://emo-lens-navy.vercel.app/">🚀 Live Demo</a></strong> · 
-  <a href="#-quick-start">Quick Start</a> · 
+  <strong><a href="https://devpost.com/software/emolens">🏅 Devpost</a></strong> · 
+  <a href="#-recognition--awards">Recognition</a> · 
   <a href="#-the-problem">The Problem</a> · 
   <a href="#-how-it-works">How It Works</a> · 
   <a href="#-features">Features</a> · 
@@ -31,6 +33,11 @@
   <a href="#-ai-architecture">AI Architecture</a> · 
   <a href="#-future-scope">Future Scope</a>
 </p>
+
+<blockquote align="center">
+  🏆 <strong>Grand Prize Winner</strong> at <strong>IncludAI: The Neurodiversity Hackathon 2026</strong> (in partnership with <strong>Stanford NNEA</strong>).<br/>
+  🎓 Selected for presentation & showcase at the <strong>Stanford Neurodiversity Summit 2026</strong> (September 19–21).
+</blockquote>
 
 ---
 
@@ -516,11 +523,12 @@ EmoLens is grounded in peer-reviewed clinical research:
 
 ---
 
-## Hackathon
+## 🏆 Recognition & Awards
 
-**EmoLens** is built for **IncludAI — The Neurodiversity Hackathon 2026**, Track 2: AI for Connection & Wellbeing.
+- **Grand Prize Winner ($1,000)** — [IncludAI: The Neurodiversity Hackathon 2026](https://devpost.com/software/emolens), organized by IncludEDU in partnership with the **Stanford Neurodiversity Network of Exceptional Abilities (NNEA)**.
+- **Featured at Stanford Neurodiversity Summit 2026** — Selected to present and showcase EmoLens at the Stanford Summit (September 19–21, 2026) to an international audience of researchers, educators, clinicians, and neurodiversity advocates.
 
-Every design decision, from the body-first interaction model to the sensory-safe animations, was made with neurodivergent users at the center — not as an afterthought, but as the foundation.
+Every design decision — from the body-first 3D interaction model to replacing ambiguous facial emojis with sensory-safe geometric icons and providing an instant non-verbal Communication Card — was inspired and shaped directly by interactions with autistic children and students at a specialized neurodivergent school.
 
 > *"Every person deserves to understand their own inner world. EmoLens gives neurodivergent youth a language for what they already feel — built from their own body's signals, not borrowed from someone else's vocabulary."*
 
